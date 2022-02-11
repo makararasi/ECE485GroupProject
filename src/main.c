@@ -4,42 +4,54 @@
 
 
 #define FILENAME "testFile.txt"
+// pass filename with list of hex addresses and a pointer 
+// to an int for the size of the array will return an 
+// array of long integers
+long *read_file(const char *filename, int *size);
+
+
 int main()
 {
-    FILE * fp;
-    char * line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    char *ptr;
-    long * number = NULL;
-    int numElements = 0;
+    int size;       // Size of array read
+    long * array = read_file(FILENAME, &size);
+
+
+    //just printing for testing
+    for (int i = 0; i < size; i++)
+    {
+        printf("element %d: %ld\n", i, array[i]);
+    }
+    printf("%d\n", size);
+
+    exit(EXIT_SUCCESS);
+}
+
+long *read_file(const char *filename, int *size)
+{
+    FILE *fp;   // declare filepointer
+    char *line = NULL;  // input line from file variable
+    size_t len = 0;     
+    ssize_t read;   // number of characters read on the line
+    char *ptr;  // this isn't really used. But holds chars that aren't in the number
+    long *number = NULL;    // the array of addresses read
+    int numElements = 0;    //size of the array
 
     fp = fopen(FILENAME, "r");
     if (fp == NULL)
         exit(EXIT_FAILURE);
-
-    while ((read = getline(&line, &len, fp)) != -1) {
+    // read to the end of the file line by line
+    while ((read = getline(&line, &len, fp)) != -1)
+    {
         numElements++;
         long temp = strtol(line, &ptr, 16);
-        number = realloc(number, numElements*sizeof(long));
-        number[numElements-1] = temp;
-        printf("Retrieved line of length %zu:\n", read);
-        printf("Hex value: %s", line);
-        printf("int value: %ld\n",number[numElements-1]);
-
+        number = realloc(number, numElements * sizeof(long));
+        number[numElements - 1] = temp;
     }
-    numElements--;
-    printf("\n\n");
-    fclose(fp);
-    if (line){
+     fclose(fp);
+    if (line)
+    {
         free(line);
     }
-    for(int i = 0; i < numElements; i++)
-    {
-        printf("element %d: %ld\n", i, number[i]);
-    }
-    
-    exit(EXIT_SUCCESS);
-    
+    *size = numElements;
+    return number;
 }
-
