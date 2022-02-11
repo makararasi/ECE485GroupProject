@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
+
 
 #define FILENAME "testFile.txt"
 #define SETS 16 * 1024            // Same number of sets for both cache.
