@@ -1,5 +1,5 @@
 #include <stdio.h>
-#inculde <sdtlib.h>
+#include <stdlib.h>
 
 
 int main()
