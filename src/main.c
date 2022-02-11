@@ -21,7 +21,7 @@ int main()
     {
         printf("element %d: %ld\n", i, array[i]);
     }
-    printf("%d\n", size);
+    printf("Number of Elements: %d\n", size);
 
     exit(EXIT_SUCCESS);
 }
