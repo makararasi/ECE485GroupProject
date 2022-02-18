@@ -12,7 +12,13 @@
 #define CACHE_SIZE_DATA (SETS * WAYS_DATA * BYTES)
 #define CACHE_SIZE_INSTR (SETS * WAYS_INSTR * BYTES)
 
-long *read_file(const char *filename, int *size);
+typedef struct address_s
+{
+    int n;
+    long addr;
+} address_t, *addressPtr_t;
+
+address_t *read_file(const char *filename, int *size);
 char *itoa(int value, char *result, int base);
 
 typedef union // this union will have 32 bits memory space allocated to it
@@ -40,7 +46,8 @@ stored_data data_cache[SETS][WAYS_DATA];         // to store data cache line .
 int main()
 {
 
-    long N, address;
+    int N;
+    long address;
     input_addr given_addr;
     u_int8_t snoop_sel;
     u_int16_t index_sel, tag_sel;
@@ -52,7 +59,7 @@ int main()
     // once we get our N (traces operation) we can atore it in N variable to select which operation we need to do.
     // after N we will get our address which will be store in the format given bellow.
     int size; // Size of array read
-    long *array = read_file(FILENAME, &size);
+    addressPtr_t array = read_file(FILENAME, &size);
 
     // assigning input address into the structure. this is done after we read data from the file and when we have got N and address separately.
     // given_addr.addr_store = address;
@@ -62,8 +69,9 @@ int main()
     for (int i = 0; i < size; i++)
     {
         char temp[33]; // 32 bits +1 for null terminator
-        given_addr.addr_store = array[i];
+        given_addr.addr_store = array[i].addr;
         printf("element: %d\n", i);
+        printf("N bit: %d\n", array[i].n);
         printf("full address HEX: %x\n", given_addr.addr_store);
         printf("snoop HEX: %x\n", given_addr.bits.snoop);
         itoa(given_addr.bits.snoop, temp, 2);
@@ -87,14 +95,14 @@ int main()
     return 0;
 }
 
-long *read_file(const char *filename, int *size)
+address_t *read_file(const char *filename, int *size)
 {
     FILE *fp;          // declare filepointer
     char *line = NULL; // input line from file variable
     size_t len = 0;
-    int read;            // number of characters read on the line
+    ssize_t read;        // number of characters read on the line
     char *ptr;           // this isn't really used. But holds chars that aren't in the number
-    long *number = NULL; // the array of addresses read
+    address_t *number = NULL; // the array of addresses read
     int numElements = 0; // size of the array
 
     fp = fopen(FILENAME, "r");
@@ -103,10 +111,20 @@ long *read_file(const char *filename, int *size)
     // read to the end of the file line by line
     while ((read = getline(&line, &len, fp)) != -1)
     {
+        
+
         numElements++;
-        long temp = strtol(line, &ptr, 16);
-        number = realloc(number, numElements * sizeof(long));
-        number[numElements - 1] = temp;
+        number = realloc(number, numElements * sizeof(address_t));
+        char temp[2];
+        char temp2[10];
+        strncpy(temp, line, 2);
+        
+        number[numElements - 1].n = atoi(temp);
+        strcpy(temp2,line+2);
+        
+        number[numElements - 1].addr = strtol(temp2, &ptr, 16);
+        
+         
     }
     fclose(fp);
     if (line)
