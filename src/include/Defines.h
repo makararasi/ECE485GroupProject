@@ -1,3 +1,14 @@
+#define _GNU_SOURCE
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <inttypes.h>
+
+
 #define SETS						16*1024                                                           //Same number of sets for both cache.
 #define WAYS_DATA             		8                                                                        // ways for data cache
 #define WAYS_INSTR           		4                                                                        // ways for instruction cache
@@ -6,6 +17,7 @@
 #define CACHE_SIZE_INSTR		(SETS * WAYS_INSTR * BYTES)
 #define LINE_LENGTH	                 250
 #define FILE_NAME                               "exp.txt"
+#define FILENAME "testFile.txt"
 
 //MESI states:-
 #define I					0
