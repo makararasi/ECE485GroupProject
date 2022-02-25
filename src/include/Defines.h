@@ -1,3 +1,4 @@
+#ifndef _DEFINES_H
 #define _GNU_SOURCE
 
 #include <stdbool.h>
@@ -51,7 +52,8 @@ typedef struct address_s
 } address_t, *addressPtr_t;
 
 //Global variables:-
-int read_result = 0, write_result = 0, hits = 0, misses = 0, way_num;
+//int read_result = 0, write_result = 0, hits = 0, misses = 0, way_num;
+int way_num;
 stored_data instruction_cache[SETS][WAYS_INSTR];       //to store instruction cache line data which are of type stored_data (structure).
 stored_data data_cache[SETS][WAYS_DATA];                       //to store data cache line .
 uint8_t LRU_instruction[SETS][WAYS_INSTR];
@@ -69,3 +71,5 @@ bool invalid_line(uint16_t index, uint8_t n);
 address_t *read_file(const char *filename, int *size);
 
 char *itoa(int value, char *result, int base);
+
+#endif

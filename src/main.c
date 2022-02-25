@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "include/Defines.h"
-
+#include <inttypes.h>
 
 
 int main()
@@ -26,10 +26,6 @@ int main()
         printf("element: %d\n", i);
         printf("N bit: %d\n", array[i].n);
         printf("full address HEX: %x\n", given_addr.addr_store);
-        //printf("snoop HEX: %x\n", given_addr.bits.snoop);
-        // itoa(given_addr.bits.snoop, temp, 2);
-        // printf("snoop BIN: %s\n", temp);
-        // printf("byte HEX: %x\n", given_addr.bits.byte);
         itoa(given_addr.bits.byte, temp, 2);
         printf("byte BIN: %s\n", temp);
         printf("index HEX: %x\n", given_addr.bits.index);

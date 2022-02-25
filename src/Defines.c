@@ -48,13 +48,13 @@ int lru_invalid_line(uint16_t ip_index, uint8_t n_op)
 	{
 		if(n_op == 0 || n_op == 1)
 		{
-			mesi = data_cache[index][i].MESI;
+			mesi = data_cache[ip_index][i].MESI;
 			if((mesi == I) && (LRU_data[ip_index][i] < LRU_data[ip_index][least]))
 				least = i;
 		}
 		else
 		{
-			mesi = instruction_cache[index][i].MESI;
+			mesi = instruction_cache[ip_index][i].MESI;
 			if((mesi == I) && (LRU_instruction[ip_index][i] < LRU_instruction[ip_index][least]))
 				least = i;
 		}
