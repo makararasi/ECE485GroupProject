@@ -54,4 +54,6 @@ int lru_invalid_line(uint16_t ip_index, uint8_t n_op);
 
 bool invalid_line(uint16_t index, uint8_t n);
 
-address_t *read_file(const char *filename, int *size)
+address_t *read_file(const char *filename, int *size);
+
+char *itoa(int value, char *result, int base);
