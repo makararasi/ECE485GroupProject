@@ -1,13 +1,9 @@
 #include "include/Defines.h"
-
-volatile int read_result = 0;
-volatile int write_result = 0; 
-volatile int hits = 0; 
-volatile int misses = 0;
-
-volatile int way_num;
-
-
+int read_result = 0;
+int write_result = 0;
+int hits = 0;
+int misses = 0;
+int way_num;
 bool valid_tag(uint8_t mesi)
 {
 	if (mesi == M || mesi == E || mesi == S)

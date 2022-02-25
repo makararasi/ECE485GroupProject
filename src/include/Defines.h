@@ -52,7 +52,13 @@ typedef struct address_s
 } address_t, *addressPtr_t;
 
 //Global variables:-
+extern int read_result;
+extern int write_result;
+extern int hits;
+extern int misses;
+extern int way_num;
 
+//int way_num;
 stored_data instruction_cache[SETS][WAYS_INSTR];       //to store instruction cache line data which are of type stored_data (structure).
 stored_data data_cache[SETS][WAYS_DATA];                       //to store data cache line .
 uint8_t LRU_instruction[SETS][WAYS_INSTR];
