@@ -32,6 +32,12 @@ typedef struct __attribute__((__packed__))             //this structure will hav
 	uint8_t reserved:2;
 } stored_data;
 
+typedef struct address_s
+{
+    int n;
+    long addr;
+} address_t, *addressPtr_t;
+
 //Global variables:-
 int read_result = 0, write_result = 0, hits = 0, misses = 0, way_num;
 stored_data instruction_cache[SETS][WAYS_INSTR];       //to store instruction cache line data which are of type stored_data (structure).
@@ -47,3 +53,5 @@ bool hit_or_miss(uint16_t tag_select, uint16_t ip_index, uint8_t op_n );
 int lru_invalid_line(uint16_t ip_index, uint8_t n_op);
 
 bool invalid_line(uint16_t index, uint8_t n);
+
+address_t *read_file(const char *filename, int *size)
