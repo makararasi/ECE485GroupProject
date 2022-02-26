@@ -24,14 +24,12 @@ int main()
 		given_addr.addr_store = array[i].addr;
 
 		N = array[i].n;
-		printf("\nN: %d\n", N);
 		index_sel = given_addr.bits.index; // index_sel will get the bits from 6-19.
 		tag_sel = given_addr.bits.tag;	   // tag_sel will get the bits 20-31.
 		if (N == 0 || N == 1)
 		{
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
-				printf("HIT\n");
 				hits++;
 				cache_behaviour(N, index_sel, way_num);
 				UpdateLRUData(index_sel, way_num);
@@ -39,7 +37,6 @@ int main()
 			}
 			else
 			{
-				printf("MISS\n");
 				misses++;
 				if (invalid_line(index_sel, N))
 				{
@@ -105,7 +102,6 @@ int main()
 		else if(N == 9) {
 			print_accessed_lines();
 		}
-		printf("i: %d\n\n",i);
 	}
 	print_hit_miss();
 
