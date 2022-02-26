@@ -105,6 +105,53 @@ bool invalid_line(uint16_t index, uint8_t n)
 		return false;
 }
 
+void set_lru ()
+{
+    for(int i=0; i<SETS; i++)
+    {
+        for(int j=0; j<WAYS_DATA; j++)
+        {
+            LRU_data[i][j]=j;
+        }
+    }
+    for(int k=0; k<SETS;k++)
+    {
+        for(int l=0;l<WAYS_INSTR;l++)
+        {
+            LRU_instruction[k][l]=l;
+        }
+    }
+}
+void UpdateLRUData(uint16_t index,int way)
+{
+   uint8_t lru = LRU_data[index][way];
+   for (int i=0; i<WAYS_DATA; i++)
+   {
+       if(LRU_data[index][i]>lru)
+        LRU_data[index][i]--;
+   }
+   LRU_data[index][way]=MRU_DATA;
+}
+
+void UpdateLRUInstr(uint16_t index, int way)
+{
+    uint16_t lru = LRU_instruction[index][way];
+    for(int j=0; j<WAYS_INSTR;j++)
+    {
+        if(LRU_instruction[index][j]>lru)
+            LRU_instruction[index][j]--;
+    }
+    LRU_instruction[index][way]=MRU_INSTR;
+}
+
+void clear_reset(void)
+{
+	memset(instruction_cache, 0, CACHE_SIZE_INSTR);
+    memset(data_cache, 0, CACHE_SIZE_DATA);
+    set_lru( );
+}
+
+
 address_t *read_file(const char *filename, int *size)
 {
 	FILE *fp;		   // declare filepointer
@@ -115,7 +162,7 @@ address_t *read_file(const char *filename, int *size)
 	address_t *number = NULL; // the array of addresses read
 	int numElements = 0;	  // size of the array
 
-	fp = fopen(FILENAME, "r");
+	fp = fopen(filename, "r");
 	if (fp == NULL)
 		exit(EXIT_FAILURE);
 	// read to the end of the file line by line
@@ -129,7 +176,11 @@ address_t *read_file(const char *filename, int *size)
 		strncpy(temp, line, 2);
 
 		number[numElements - 1].n = atoi(temp);
-		strcpy(temp2, line + 2);
+		//strcpy(temp2, line + 2);
+		int j = 0;
+		for(int i = 2; i<10; i++){
+			temp2[j++] = line[i];
+		}
 
 		number[numElements - 1].addr = strtol(temp2, &ptr, 16);
 	}
@@ -142,87 +193,49 @@ address_t *read_file(const char *filename, int *size)
 	return number;
 }
 
-// void cache_behaviour(int N, int index)
-// {
-
-// 	// 00---I
-// 	// 01---E
-// 	// 10---M
-// 	// 11---s
-
-// 	if (N == 0)
-// 	{
-
-// 		if (data_cache[index][way_num].MESI == I) // I
-// 		{
-// 			data_cache[index][way_num].MESI = E;
-// 		} // E
-
-// 		else if (data_cache[index][way_num].MESI == M)
-// 		{
-// 			data_cache[index][way_num].MESI = M;
-// 		} // M
-
-// 		else if (data_cache[index][way_num].MESI == E)
-// 		{
-// 			data_cache[index][way_num].MESI = S;
-// 		} // S
-
-// 					else if(data_cache[index][way_num].MESI == S)
-// 					{
-// 						data_cache[index][way_num].MESI == S;
-// 					} // S
-// 	}
-// 	else if (N == 1)
-// 	{
-// 		if (data_cache[index][way_num].MESI == I) // I
-// 		{
-// 			data_cache[index][way_num].MESI = M;
-// 		} // M
-
-// 		else if (data_cache[index][way_num].MESI == M)
-// 		{
-// 			data_cache[index][way_num].MESI = M;
-// 		} // M
-
-// 		else if (data_cache[index][way_num].MESI == E) // E
-// 		{
-// 			data_cache[index][way_num].MESI = M;
-// 		} // M
-
-// 					else if(data_cache[index][way_num].MESI == S) //S
-// 					{
-// 						data_cache[index][way_num].MESI == M;
-// 					} // M
-// 	}
-// 	else if (N == 2)
-// 	{
-// 		if (instruction_cache[index][way_num].MESI == I) // I
-// 		{
-// 			instruction_cache[index][way_num].MESI = E;
-// 		} // E
-
-// 		else if (instruction_cache[index][way_num].MESI == M)
-// 		{
-// 			instruction_cache[index][way_num].MESI = M;
-// 		} // M
-
-// 		else if (instruction_cache[index][way_num].MESI == E) // E
-// 		{
-// 			instruction_cache[index][way_num].MESI = S;
-// 		} // S
-
-// 		else if (instruction_cache[index][way_num].MESI == S) // S
-// 		{
-// 			instruction_cache[index][way_num].MESI == S;
-// 		} // S
-// 	}
-// 	else if (N == 3 || N == 4)
-// 	{
-// 		data_cache[index][way_num].MESI = I;
-// 	}
-// }
-
+void cache_behaviour(int N, uint16_t index, int way_num)
+{
+	if (N == 0)
+	{
+		read_result++;
+		if (data_cache[index][way_num].MESI == I)
+			data_cache[index][way_num].MESI = E;
+		else if (data_cache[index][way_num].MESI == M)
+			data_cache[index][way_num].MESI = M;
+		else if (data_cache[index][way_num].MESI == E)
+			data_cache[index][way_num].MESI = S;
+		else if (data_cache[index][way_num].MESI == S)
+			data_cache[index][way_num].MESI == S;
+	}
+	else if (N == 1)
+	{
+		write_result++;
+		if (data_cache[index][way_num].MESI == I)
+			data_cache[index][way_num].MESI = M;
+		else if (data_cache[index][way_num].MESI == M)
+			data_cache[index][way_num].MESI = M;
+		else if (data_cache[index][way_num].MESI == E)
+			data_cache[index][way_num].MESI = M;
+		else if (data_cache[index][way_num].MESI == S)
+			data_cache[index][way_num].MESI == M;
+	}
+	else if (N == 2)
+	{
+		read_result++;
+		if (instruction_cache[index][way_num].MESI == I)
+			instruction_cache[index][way_num].MESI = E;
+		else if (instruction_cache[index][way_num].MESI == M)
+			instruction_cache[index][way_num].MESI = M;
+		else if (instruction_cache[index][way_num].MESI == E)
+			instruction_cache[index][way_num].MESI = S;
+		else if (instruction_cache[index][way_num].MESI == S)
+			instruction_cache[index][way_num].MESI == S;
+	}
+	else if (N == 3 || N == 4)
+	{
+		data_cache[index][way_num].MESI = I;
+	}
+}
 // bool lru_counter_data(int index, int way_num)
 // {
 // 	// lru_count is a global variable
@@ -274,21 +287,64 @@ address_t *read_file(const char *filename, int *size)
 // 	}
 // }
 
-
 void print_hit_miss(void)
 {
 	printf("----------------------------------------------------\n");
 	printf("----------------------------------------------------\n");
 	printf("Number of hits: %d\n", hits);
 	printf("Number of misses: %d\n", misses);
+	printf("Number of reads: %d\n", read_result);
+	printf("Number of writes: %d\n", write_result);
 
-	float avg_hit = (float)(hits)/(float)(hits + misses);
-	printf("Average hit: %.3f = %.0f %%\n", avg_hit, (avg_hit * 100));
-	printf("Average miss: %.3f = %.0f %%\n", (1-avg_hit), ((1-avg_hit) *100) );
+	float avg_hit = (float)(hits) / (float)(hits + misses);
+	printf("Cache hit ratio: %.4f = %.2f %%\n", avg_hit, (avg_hit * 100));
+	//printf("Average miss: %.2f = %.0f %%\n", (1 - avg_hit), ((1 - avg_hit) * 100));
 	printf("----------------------------------------------------\n");
 	printf("----------------------------------------------------\n");
 }
 
+void print_accessed_lines(void)
+{
+	char state;
+	uint8_t lru;
+	uint16_t tag;
+	printf("Accessed lines of DATA CACHE : \n");
+	printf("Index\tWays\tState\tLRU\tTag\n");
+	for(int i = 0; i < SETS; i++)
+	{	for(int j = 0; j < WAYS_DATA; j++)
+		{	if (data_cache[i][j].MESI == I)
+				state = 'I';
+			else if (data_cache [i][j].MESI == M)
+				state = 'M';
+			else if (data_cache [i][j].MESI == E)
+				state = 'E';
+			else if (data_cache [i][j].MESI == S)
+				state = 'S';
+			tag = data_cache [i][j].tag_store;
+			lru = LRU_data[i][j];
+			if (data_cache[i][j].line_accessed)
+				printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
+		}
+	}
+	printf("Accessed lines of INSTRUCTION CACHE : \n");
+	printf("Index\tWays\tState\tLRU\tTag\n");
+	for(int i = 0; i < SETS; i++)
+	{	for(int j = 0; j < WAYS_INSTR; j++)
+		{	if (instruction_cache[i][j].MESI == I)
+				state = 'I';
+			else if (instruction_cache[i][j].MESI == M)
+				state = 'M';
+			else if (instruction_cache[i][j].MESI == E)
+				state = 'E';
+			else if (instruction_cache[i][j].MESI == S)
+				state = 'S';
+			tag = instruction_cache[i][j].tag_store;
+			lru = LRU_instruction[i][j];
+			if (instruction_cache[i][j].line_accessed)
+				printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
+		}
+	}
+}
 
 // from: https://stackoverflow.com/questions/8257714/how-to-convert-an-int-to-string-in-c
 /**
@@ -326,4 +382,21 @@ char *itoa(int value, char *result, int base)
 		*ptr1++ = tmp_char;
 	}
 	return result;
+}
+
+int victim_line(uint16_t index, uint8_t n){
+
+	if(n == 1 || n == 0) {
+		for(int i = 0; i < WAYS_DATA; i++) {
+			if(LRU_data[index][i] == LRU) 
+				return i;
+		}
+	}
+	else if(n == 2) {
+		for(int i = 0; i < WAYS_DATA; i++) {
+			if(LRU_instruction[index][i] == LRU) 
+				return i;
+		}
+	}
+	return 0;
 }

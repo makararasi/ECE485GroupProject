@@ -10,6 +10,10 @@
 #include <inttypes.h>
 
 
+#define MRU_DATA                               (WAYS_DATA - 1)
+#define MRU_INSTR                             (WAYS_INSTR - 1)
+#define LRU                                                0
+
 #define SETS						16*1024                                                           //Same number of sets for both cache.
 #define WAYS_DATA             		8                                                                        // ways for data cache
 #define WAYS_INSTR           		4                                                                        // ways for instruction cache
@@ -17,8 +21,8 @@
 #define CACHE_SIZE_DATA		(SETS * WAYS_DATA * BYTES)
 #define CACHE_SIZE_INSTR		(SETS * WAYS_INSTR * BYTES)
 #define LINE_LENGTH	                 250
-#define FILE_NAME                               "exp.txt"
-#define FILENAME "testFile.txt"
+#define FILE_NAME                               "testFile.txt"
+
 
 //MESI states:-
 #define I					0
@@ -42,7 +46,8 @@ typedef struct __attribute__((__packed__))             //this structure will hav
 {
 	uint16_t tag_store:12;
 	uint8_t MESI:2;
-	uint8_t reserved:2;
+	uint8_t reserved:1;
+	bool line_accessed:1;
 } stored_data;
 
 typedef struct address_s
@@ -82,9 +87,21 @@ bool lru_counter_instruction(int index, int way_num);
 
 bool lru_counter_data(int index, int way_num);
 
-void cache_behaviour(int N, int index);
+void cache_behaviour(int N, uint16_t index, int way_num);
 
 void print_hit_miss(void);
+
+void print_accessed_lines(void);
+
+void clear_reset(void);
+
+void UpdateLRUInstr(uint16_t index, int way);
+
+void UpdateLRUData(uint16_t index,int way);
+
+void set_lru ();
+
+int victim_line(uint16_t index, uint8_t n);
 
 
 #endif
