@@ -277,7 +277,16 @@ address_t *read_file(const char *filename, int *size)
 
 void print_hit_miss(void)
 {
+	printf("----------------------------------------------------");
+	printf("----------------------------------------------------");
+	printf("Number of hits: %d\n", hits);
+	printf("Number of misses: %d\n", misses);
 
+	float avg_hit = (hits)/(hits + misses);
+	printf("Average hit: %.2f\n", avg_hit);
+	printf("Average miss: %.2f\n", (1-avg_hit));
+	printf("----------------------------------------------------");
+	printf("----------------------------------------------------");
 }
 
 
