@@ -2,26 +2,22 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "Defines.h"
+#include "include/Defines.h"
 #include <inttypes.h>
 
 int main()
 {
-	int N,mode;
-    int size; // Size to read
+	int N;
 	input_addr given_addr;
 	uint16_t index_sel, tag_sel;
 
-    printf("Enter the desired mode :- ");
-    scanf("%d",&mode);
-    printf("the desired mode is :- %d\n",mode);
 	memset(instruction_cache, 0, CACHE_SIZE_INSTR); // it will set our cache to all zeros to start with.
 	memset(data_cache, 0, CACHE_SIZE_DATA);
-    set_lru ();
-	addressPtr_t array = read_file(FILE_NAME, &size);
 
+	int size; // Size of array read
+	addressPtr_t array = read_file(FILE_NAME, &size);
 	// assigning input address into the structure. this is done after we read data from the file and when we have got N and address separately.
-	// given_addr.addr_store = address;c
+	// given_addr.addr_store = address;
 	for (int i = 0; i < size; i++)
 	{
 
@@ -35,34 +31,27 @@ int main()
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
 				hits++;
-				cache_behaviour(N, index_sel, way_num,array[i].addr,mode);
+				cache_behaviour(N, index_sel, way_num);
 				UpdateLRUData(index_sel, way_num);
 				data_cache[index_sel][way_num].line_accessed = 1;
 			}
 			else
 			{
 				misses++;
-                if(mode == 1 && N == 0)
-                        printf("Read data from L2 <%x>\n",array[i].addr);
-                if(mode == 1 && N == 1)
-                        printf("Read for Ownership from L2 <%x>\n",array[i].addr);
-
 				if (invalid_line(index_sel, N))
 				{
 					UpdateLRUData(index_sel, way_num);
 					data_cache[index_sel][way_num].tag_store = tag_sel;
-					cache_behaviour(N, index_sel, way_num,array[i].addr,mode);
+					cache_behaviour(N, index_sel, way_num);
 					data_cache[index_sel][way_num].line_accessed = 1;
 				}
 				else
 				{
 					way_num = victim_line(index_sel, N);
-                    if(mode == 1 && data_cache[index_sel][way_num].MESI == M)
-                        printf("write to L2 <%x>\n",array[i].addr);
 					data_cache[index_sel][way_num].tag_store = tag_sel;
 					UpdateLRUData(index_sel, way_num);
 					data_cache[index_sel][way_num].MESI = I;
-					cache_behaviour(N, index_sel, way_num,array[i].addr,mode);
+					cache_behaviour(N, index_sel, way_num);
 					data_cache[index_sel][way_num].line_accessed = 1;
 				}
 			}
@@ -71,34 +60,30 @@ int main()
 
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
-				
+				printf("HIT\n");
 				hits++;
-				cache_behaviour(N, index_sel, way_num,array[i].addr,mode);
+				cache_behaviour(N, index_sel, way_num);
 				UpdateLRUInstr(index_sel, way_num);
 				instruction_cache[index_sel][way_num].line_accessed = 1;
 			}
 			else
 			{
-				
-                if(mode == 1)
-                        printf("Read data from L2 <%x>\n",array[i].addr);
+				printf("miss\n");
 				misses++;
 				if (invalid_line(index_sel, N))
 				{
 					UpdateLRUInstr(index_sel, way_num);
 					instruction_cache[index_sel][way_num].tag_store = tag_sel;
-					cache_behaviour(N, index_sel, way_num,array[i].addr,mode);
+					cache_behaviour(N, index_sel, way_num);
 					instruction_cache[index_sel][way_num].line_accessed = 1;
 				}
 				else
 				{
 					way_num = victim_line(index_sel, N);
-                    if(mode == 1 && instruction_cache[index_sel][way_num].MESI == M)
-                        printf("write to L2 <%x>\n",array[i].addr);
 					instruction_cache[index_sel][way_num].tag_store = tag_sel;
 					UpdateLRUInstr(index_sel, way_num);
 					instruction_cache[index_sel][way_num].MESI = I;
-					cache_behaviour(N, index_sel, way_num,array[i].addr,mode);
+					cache_behaviour(N, index_sel, way_num);
 					instruction_cache[index_sel][way_num].line_accessed = 1;
 				}
 			}
@@ -107,7 +92,7 @@ int main()
 		}
 		else if(N == 3 || N == 4) {
 			if(hit_or_miss(tag_sel, index_sel, N)) {
-				cache_behaviour(N, index_sel, way_num,array[i].addr,mode);
+				cache_behaviour(N, index_sel, way_num);
 			}
 			
 		}

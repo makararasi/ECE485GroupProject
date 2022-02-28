@@ -1,10 +1,9 @@
-#include "Defines.h"
+#include "include/Defines.h"
 int read_result = 0;
 int write_result = 0;
 int hits = 0;
 int misses = 0;
 int way_num;
-//int mode;
 bool valid_tag(uint8_t mesi)
 {
 	if (mesi == M || mesi == E || mesi == S)
@@ -194,9 +193,8 @@ address_t *read_file(const char *filename, int *size)
 	return number;
 }
 
-void cache_behaviour(int N, uint16_t index, int way_num, uint32_t addr,int mode)
+void cache_behaviour(int N, uint16_t index, int way_num)
 {
-    
 	if (N == 0)
 	{
 		read_result++;
@@ -234,10 +232,7 @@ void cache_behaviour(int N, uint16_t index, int way_num, uint32_t addr,int mode)
 			instruction_cache[index][way_num].MESI == S;
 	}
 	else if (N == 3 || N == 4)
-	{   
-        //printf("Hi\n");
-        if(N == 4 && mode == 1 && data_cache[index][way_num].MESI == M)
-            printf("Read data to L2 <%x>\n",addr);
+	{
 		data_cache[index][way_num].MESI = I;
 	}
 }
@@ -331,7 +326,6 @@ void print_accessed_lines(void)
 				printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
 		}
 	}
-    printf("\n");
 	printf("Accessed lines of INSTRUCTION CACHE : \n");
 	printf("Index\tWays\tState\tLRU\tTag\n");
 	for(int i = 0; i < SETS; i++)
@@ -350,7 +344,6 @@ void print_accessed_lines(void)
 				printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
 		}
 	}
-    printf("\n");
 }
 
 // from: https://stackoverflow.com/questions/8257714/how-to-convert-an-int-to-string-in-c

@@ -65,7 +65,7 @@ extern int way_num;
 
 //int way_num;
 stored_data instruction_cache[SETS][WAYS_INSTR];       //to store instruction cache line data which are of type stored_data (structure).
-stored_data data_cache[SETS][WAYS_DATA];                       //to store data cache line .
+stored_data data_cache[SETS][WAYS_DATA]; //to store data cache line                  
 uint8_t LRU_instruction[SETS][WAYS_INSTR];
 uint8_t LRU_data[SETS][WAYS_DATA];
 uint8_t lru_count[SETS][WAYS_DATA];
