@@ -235,62 +235,12 @@ void cache_behaviour(int N, uint16_t index, int way_num, uint32_t addr,int mode)
 	}
 	else if (N == 3 || N == 4)
 	{   
-        //printf("Hi\n");
         if(N == 4 && mode == 1 && data_cache[index][way_num].MESI == M)
             printf("Read data to L2 <%x>\n",addr);
 		data_cache[index][way_num].MESI = I;
 	}
 }
-// bool lru_counter_data(int index, int way_num)
-// {
-// 	// lru_count is a global variable
 
-// 	if (lru_count[index] <= 3)
-// 	{
-// 		LRU_data[index][way_num] = lru_count[0][index];
-// 		++lru_count[0][index];
-// 	}
-
-// 	else
-// 	{
-// 		for (int i = 0; i <= 3; ++i)
-// 		{
-// 			if (LRU_data[index][i] == 0)
-// 			{
-// 				LRU_data[index][i] = lru_count[0][index] - 1;
-// 			}
-// 			else
-// 			{
-// 				--LRU_data[index][i];
-// 			}
-// 		}
-// 	}
-// }
-// bool lru_counter_instruction(int index, int way_num)
-// {
-// 	// lru_count is a global variable
-
-// 	if (lru_count[index] <= 7)
-// 	{
-// 		LRU_instruction[index][way_num] = lru_count[1][index];
-// 		++lru_count[1][index];
-// 	}
-
-// 	else
-// 	{
-// 		for (int i = 0; i <= 7; ++i)
-// 		{
-// 			if (LRU_instruction[index][i] == 0)
-// 			{
-// 				LRU_instruction[index][i] = lru_count[1][index] - 1;
-// 			}
-// 			else
-// 			{
-// 				--LRU_instruction[index][i];
-// 			}
-// 		}
-// 	}
-// }
 
 void print_hit_miss(void)
 {
@@ -303,7 +253,6 @@ void print_hit_miss(void)
 
 	float avg_hit = (float)(hits) / (float)(hits + misses);
 	printf("Cache hit ratio: %.4f = %.2f %%\n", avg_hit, (avg_hit * 100));
-	//printf("Average miss: %.2f = %.0f %%\n", (1 - avg_hit), ((1 - avg_hit) * 100));
 	printf("----------------------------------------------------\n");
 	printf("----------------------------------------------------\n");
 }
@@ -359,37 +308,37 @@ void print_accessed_lines(void)
  * Written by Lukás Chmela
  * Released under GPLv3.
  */
-char *itoa(int value, char *result, int base)
-{
-	// check that the base if valid
-	if (base < 2 || base > 36)
-	{
-		*result = '\0';
-		return result;
-	}
+// char *itoa(int value, char *result, int base)
+// {
+// 	// check that the base if valid
+// 	if (base < 2 || base > 36)
+// 	{
+// 		*result = '\0';
+// 		return result;
+// 	}
 
-	char *ptr = result, *ptr1 = result, tmp_char;
-	int tmp_value;
+// 	char *ptr = result, *ptr1 = result, tmp_char;
+// 	int tmp_value;
 
-	do
-	{
-		tmp_value = value;
-		value /= base;
-		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + (tmp_value - value * base)];
-	} while (value);
+// 	do
+// 	{
+// 		tmp_value = value;
+// 		value /= base;
+// 		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + (tmp_value - value * base)];
+// 	} while (value);
 
-	// Apply negative sign
-	if (tmp_value < 0)
-		*ptr++ = '-';
-	*ptr-- = '\0';
-	while (ptr1 < ptr)
-	{
-		tmp_char = *ptr;
-		*ptr-- = *ptr1;
-		*ptr1++ = tmp_char;
-	}
-	return result;
-}
+// 	// Apply negative sign
+// 	if (tmp_value < 0)
+// 		*ptr++ = '-';
+// 	*ptr-- = '\0';
+// 	while (ptr1 < ptr)
+// 	{
+// 		tmp_char = *ptr;
+// 		*ptr-- = *ptr1;
+// 		*ptr1++ = tmp_char;
+// 	}
+// 	return result;
+// }
 
 int victim_line(uint16_t index, uint8_t n){
 
