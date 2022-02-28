@@ -1,0 +1,108 @@
+Enter the desired mode :- 1
+the desired mode is :- 1
+Read data from L2 <984de132>
+Read data from L2 <116de12f>
+Read data from L2 <100de130>
+Read data from L2 <999de12e>
+Accessed lines of DATA CACHE :
+Index   Ways    State   LRU     Tag
+
+Accessed lines of INSTRUCTION CACHE :
+Index   Ways    State   LRU     Tag
+
+Read data from L2 <846de107>
+Read data from L2 <408ed4>
+Read data from L2 <408ed4>
+Read data from L2 <211de128>
+Read data from L2 <777de133>
+Accessed lines of DATA CACHE :
+Index   Ways    State   LRU     Tag
+3784    0       E       6       211
+3784    1       I       7       777
+
+Accessed lines of INSTRUCTION CACHE :
+Index   Ways    State   LRU     Tag
+23b     0       S       3       4
+
+Read for Ownership from L2 <999de132>
+Read for Ownership from L2 <666de135>
+Read for Ownership from L2 <333de12c>
+Read data from L2 <846de10c>
+Read data from L2 <777de136>
+Read for Ownership from L2 <abcde128>
+Read data from L2 <116de101>
+Read for Ownership from L2 <100de101>
+Read for Ownership from L2 <aaade101>
+Accessed lines of DATA CACHE :
+Index   Ways    State   LRU     Tag
+3784    0       M       7       aaa
+3784    1       E       5       116
+3784    2       M       6       100
+3784    3       M       0       666
+3784    4       M       1       333
+3784    5       E       2       846
+3784    6       E       3       777
+3784    7       M       4       abc
+
+Accessed lines of INSTRUCTION CACHE :
+Index   Ways    State   LRU     Tag
+23b     0       S       3       4
+
+Read for Ownership from L2 <11>
+Accessed lines of DATA CACHE :
+Index   Ways    State   LRU     Tag
+0       0       M       7       0
+3784    0       M       7       aaa
+3784    1       E       5       116
+3784    2       M       6       100
+3784    3       M       0       666
+3784    4       M       1       333
+3784    5       E       2       846
+3784    6       E       3       777
+3784    7       M       4       abc
+
+Accessed lines of INSTRUCTION CACHE :
+Index   Ways    State   LRU     Tag
+23b     0       S       3       4
+
+Accessed lines of DATA CACHE :
+Index   Ways    State   LRU     Tag
+0       0       M       7       0
+3784    0       M       7       aaa
+3784    1       E       5       116
+3784    2       M       6       100
+3784    3       M       0       666
+3784    4       M       1       333
+3784    5       E       2       846
+3784    6       E       3       777
+3784    7       M       4       abc
+
+Accessed lines of INSTRUCTION CACHE :
+Index   Ways    State   LRU     Tag
+23b     0       S       3       4
+
+Accessed lines of DATA CACHE :
+Index   Ways    State   LRU     Tag
+0       0       M       7       0
+3784    0       M       7       aaa
+3784    1       E       5       116
+3784    2       M       6       100
+3784    3       M       0       666
+3784    4       M       1       333
+3784    5       E       2       846
+3784    6       E       3       777
+3784    7       M       4       abc
+
+Accessed lines of INSTRUCTION CACHE :
+Index   Ways    State   LRU     Tag
+23b     0       S       3       4
+
+----------------------------------------------------
+----------------------------------------------------
+Number of hits: 6
+Number of misses: 19
+Number of reads: 16
+Number of writes: 9
+Cache hit ratio: 0.2400 = 24.00 %
+----------------------------------------------------
+----------------------------------------------------
