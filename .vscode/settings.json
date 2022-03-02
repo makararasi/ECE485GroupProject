@@ -3,5 +3,8 @@
         "stdint.h": "c",
         "defines.h": "c"
     },
-    "docwriter.style": "Doxygen"
+    "docwriter.style": "Doxygen",
+    "docwriter.progress.trackFunctions": true,
+    "docwriter.progress.trackClasses": true,
+    "docwriter.progress.trackTypes": true
 }

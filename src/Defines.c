@@ -7,9 +7,9 @@ int way_num;
 
 /**
  * If the tag is M, E, or S, return true. Otherwise, return false
- * 
+ *
  * @param mesi the MESI protocol state of the cache line
- * 
+ *
  * @return Nothing.
  */
 bool valid_tag(uint8_t mesi)
@@ -21,11 +21,11 @@ bool valid_tag(uint8_t mesi)
 
 /**
  * If the tag stored in the cache is equal to the tag selected, then the cache line is hit
- * 
+ *
  * @param tag_select The tag that we are looking for in the cache.
  * @param ip_index The index of the cache block we're looking at.
  * @param op_n 0 = read, 1 = read-modify-write, 2 = write, 3 = write-through, 4 = write-back
- * 
+ *
  * @return The way number of the cache line that was hit or miss.
  */
 bool hit_or_miss(uint16_t tag_select, uint16_t ip_index, uint8_t op_n)
@@ -65,10 +65,10 @@ bool hit_or_miss(uint16_t tag_select, uint16_t ip_index, uint8_t op_n)
 /**
  * If there is a single invalid line in the cache, return true. If there are multiple invalid lines,
  * return true and set the way_num variable to the index of the least recently used line
- * 
+ *
  * @param ip_index The index of the cache line to be invalidated.
  * @param n_op 0 for data, 1 for instruction
- * 
+ *
  * @return The way number of the line that is being invalidated.
  */
 int lru_invalid_line(uint16_t ip_index, uint8_t n_op)
@@ -95,10 +95,10 @@ int lru_invalid_line(uint16_t ip_index, uint8_t n_op)
 /**
  * If there is only one line in the set that is in the invalid state, then return true. Otherwise,
  * return false
- * 
+ *
  * @param index The index of the cache block to be invalidated.
  * @param n 0 for data, 1 for instruction
- * 
+ *
  * @return The way number of the line that is being invalidated.
  */
 bool invalid_line(uint16_t index, uint8_t n)
@@ -144,58 +144,58 @@ bool invalid_line(uint16_t index, uint8_t n)
  * This function sets the LRU values of the data and instruction cache to
  * 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 respectively
  */
-void set_lru ()
+void set_lru()
 {
-    for(int i=0; i<SETS; i++)
-    {
-        for(int j=0; j<WAYS_DATA; j++)
-        {
-            LRU_data[i][j]=j;
-        }
-    }
-    for(int k=0; k<SETS;k++)
-    {
-        for(int l=0;l<WAYS_INSTR;l++)
-        {
-            LRU_instruction[k][l]=l;
-        }
-    }
+	for (int i = 0; i < SETS; i++)
+	{
+		for (int j = 0; j < WAYS_DATA; j++)
+		{
+			LRU_data[i][j] = j;
+		}
+	}
+	for (int k = 0; k < SETS; k++)
+	{
+		for (int l = 0; l < WAYS_INSTR; l++)
+		{
+			LRU_instruction[k][l] = l;
+		}
+	}
 }
 
 /**
  * UpdateLRUData(index,way)
- * 
+ *
  * This function updates the LRU_data array for the given index and way
- * 
+ *
  * @param index The index of the cache block we're updating.
  * @param way the way of the cache block
  */
-void UpdateLRUData(uint16_t index,int way)
+void UpdateLRUData(uint16_t index, int way)
 {
-   uint8_t lru = LRU_data[index][way];
-   for (int i=0; i<WAYS_DATA; i++)
-   {
-       if(LRU_data[index][i]>lru)
-        LRU_data[index][i]--;
-   }
-   LRU_data[index][way]=MRU_DATA;
+	uint8_t lru = LRU_data[index][way];
+	for (int i = 0; i < WAYS_DATA; i++)
+	{
+		if (LRU_data[index][i] > lru)
+			LRU_data[index][i]--;
+	}
+	LRU_data[index][way] = MRU_DATA;
 }
 
 /**
  * UpdateLRUInstr() updates the LRU bits for the instruction cache
- * 
+ *
  * @param index The index of the cache block we're updating.
  * @param way the way of the cache block we want to update
  */
 void UpdateLRUInstr(uint16_t index, int way)
 {
-    uint16_t lru = LRU_instruction[index][way];
-    for(int j=0; j<WAYS_INSTR;j++)
-    {
-        if(LRU_instruction[index][j]>lru)
-            LRU_instruction[index][j]--;
-    }
-    LRU_instruction[index][way]=MRU_INSTR;
+	uint16_t lru = LRU_instruction[index][way];
+	for (int j = 0; j < WAYS_INSTR; j++)
+	{
+		if (LRU_instruction[index][j] > lru)
+			LRU_instruction[index][j]--;
+	}
+	LRU_instruction[index][way] = MRU_INSTR;
 }
 
 /**
@@ -204,17 +204,16 @@ void UpdateLRUInstr(uint16_t index, int way)
 void clear_reset(void)
 {
 	memset(instruction_cache, 0, CACHE_SIZE_INSTR);
-    memset(data_cache, 0, CACHE_SIZE_DATA);
-    set_lru( );
+	memset(data_cache, 0, CACHE_SIZE_DATA);
+	set_lru();
 }
-
 
 /**
  * Reads a file of addresses and stores them in an array
- * 
+ *
  * @param filename the name of the file to read from
  * @param size the size of the array
- * 
+ *
  * @return An array of addresses.
  */
 address_t *read_file(const char *filename, int *size)
@@ -241,9 +240,10 @@ address_t *read_file(const char *filename, int *size)
 		strncpy(temp, line, 2);
 
 		number[numElements - 1].n = atoi(temp);
-		//strcpy(temp2, line + 2);
+		// strcpy(temp2, line + 2);
 		int j = 0;
-		for(int i = 2; i<10; i++){
+		for (int i = 2; i < 10; i++)
+		{
 			temp2[j++] = line[i];
 		}
 
@@ -260,16 +260,16 @@ address_t *read_file(const char *filename, int *size)
 
 /**
  * The cache_behaviour function is used to update the MESI state of the cache line
- * 
+ *
  * @param N 0 for read, 1 for write, 2 for instruction fetch
  * @param index The index of the cache block to be accessed.
  * @param way_num the number of the way in the set
  * @param addr The address of the cache line that is being accessed.
  * @param mode 0 for data, 1 for instruction
  */
-void cache_behaviour(int N, uint16_t index, int way_num, uint32_t addr,int mode)
+void cache_behaviour(int N, uint16_t index, int way_num, uint32_t addr, int mode)
 {
-    
+
 	if (N == 0)
 	{
 		read_result++;
@@ -307,13 +307,12 @@ void cache_behaviour(int N, uint16_t index, int way_num, uint32_t addr,int mode)
 			instruction_cache[index][way_num].MESI == S;
 	}
 	else if (N == 3 || N == 4)
-	{   
-        if(N == 4 && mode == 1 && data_cache[index][way_num].MESI == M)
-            printf("Read data to L2 <%x>\n",addr);
+	{
+		if (N == 4 && mode == 1 && data_cache[index][way_num].MESI == M)
+			printf("Read data to L2 <%x>\n", addr);
 		data_cache[index][way_num].MESI = I;
 	}
 }
-
 
 /**
  * Prints out the number of hits, misses, reads, and writes
@@ -343,28 +342,32 @@ void print_accessed_lines(void)
 	uint16_t tag;
 	printf("Accessed lines of DATA CACHE : \n");
 	printf("Index\tWays\tState\tLRU\tTag\n");
-	for(int i = 0; i < SETS; i++)
-	{	for(int j = 0; j < WAYS_DATA; j++)
-		{	if (data_cache[i][j].MESI == I)
+	for (int i = 0; i < SETS; i++)
+	{
+		for (int j = 0; j < WAYS_DATA; j++)
+		{
+			if (data_cache[i][j].MESI == I)
 				state = 'I';
-			else if (data_cache [i][j].MESI == M)
+			else if (data_cache[i][j].MESI == M)
 				state = 'M';
-			else if (data_cache [i][j].MESI == E)
+			else if (data_cache[i][j].MESI == E)
 				state = 'E';
-			else if (data_cache [i][j].MESI == S)
+			else if (data_cache[i][j].MESI == S)
 				state = 'S';
-			tag = data_cache [i][j].tag_store;
+			tag = data_cache[i][j].tag_store;
 			lru = LRU_data[i][j];
 			if (data_cache[i][j].line_accessed)
-				printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
+				printf("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
 		}
 	}
-    printf("\n");
+	printf("\n");
 	printf("Accessed lines of INSTRUCTION CACHE : \n");
 	printf("Index\tWays\tState\tLRU\tTag\n");
-	for(int i = 0; i < SETS; i++)
-	{	for(int j = 0; j < WAYS_INSTR; j++)
-		{	if (instruction_cache[i][j].MESI == I)
+	for (int i = 0; i < SETS; i++)
+	{
+		for (int j = 0; j < WAYS_INSTR; j++)
+		{
+			if (instruction_cache[i][j].MESI == I)
 				state = 'I';
 			else if (instruction_cache[i][j].MESI == M)
 				state = 'M';
@@ -375,32 +378,36 @@ void print_accessed_lines(void)
 			tag = instruction_cache[i][j].tag_store;
 			lru = LRU_instruction[i][j];
 			if (instruction_cache[i][j].line_accessed)
-				printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
+				printf("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
 		}
 	}
-    printf("\n");
+	printf("\n");
 }
-
 
 /**
  * Given a cache index and a number of ways, return the index of the least recently used way
- * 
+ *
  * @param index the index of the cache block we're looking at
  * @param n 1 for data, 2 for instruction
- * 
+ *
  * @return The index of the line that is being replaced.
  */
-int victim_line(uint16_t index, uint8_t n){
+int victim_line(uint16_t index, uint8_t n)
+{
 
-	if(n == 1 || n == 0) {
-		for(int i = 0; i < WAYS_DATA; i++) {
-			if(LRU_data[index][i] == LRU) 
+	if (n == 1 || n == 0)
+	{
+		for (int i = 0; i < WAYS_DATA; i++)
+		{
+			if (LRU_data[index][i] == LRU)
 				return i;
 		}
 	}
-	else if(n == 2) {
-		for(int i = 0; i < WAYS_DATA; i++) {
-			if(LRU_instruction[index][i] == LRU) 
+	else if (n == 2)
+	{
+		for (int i = 0; i < WAYS_DATA; i++)
+		{
+			if (LRU_instruction[index][i] == LRU)
 				return i;
 		}
 	}
