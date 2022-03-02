@@ -1,3 +1,9 @@
+/**************************************************************************************
+ * File    : main.c
+ * Project : ECE 485/585 L1 split cache.
+ * Term    : Winter 2022
+ * Authors : Luke Hoskam, Vemuri Kousalya Gayatri, Payal Kalamdar, Sasi Kiran Nalluri.
+ **************************************************************************************/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

@@ -380,7 +380,7 @@ void print_accessed_lines(void)
 
 
 /*************************************************************************
-* Searchs the Least Recently Used line in the given set/index. 
+* Searches the Least Recently Used line in the given set/index. 
 * Inputs: index (comes from the address), n (operation N from trace file).
 * Output: Returns the way at which the LRU line is found. 
 **************************************************************************/
