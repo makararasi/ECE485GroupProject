@@ -4,7 +4,14 @@ int write_result = 0;
 int hits = 0;
 int misses = 0;
 int way_num;
-//int mode;
+
+/**
+ * If the tag is M, E, or S, return true. Otherwise, return false
+ * 
+ * @param mesi the MESI protocol state of the cache line
+ * 
+ * @return Nothing.
+ */
 bool valid_tag(uint8_t mesi)
 {
 	if (mesi == M || mesi == E || mesi == S)
@@ -12,6 +19,15 @@ bool valid_tag(uint8_t mesi)
 	return false;
 }
 
+/**
+ * If the tag stored in the cache is equal to the tag selected, then the cache line is hit
+ * 
+ * @param tag_select The tag that we are looking for in the cache.
+ * @param ip_index The index of the cache block we're looking at.
+ * @param op_n 0 = read, 1 = read-modify-write, 2 = write, 3 = write-through, 4 = write-back
+ * 
+ * @return The way number of the cache line that was hit or miss.
+ */
 bool hit_or_miss(uint16_t tag_select, uint16_t ip_index, uint8_t op_n)
 {
 	uint16_t tagstored;
@@ -46,6 +62,15 @@ bool hit_or_miss(uint16_t tag_select, uint16_t ip_index, uint8_t op_n)
 	return false;
 }
 
+/**
+ * If there is a single invalid line in the cache, return true. If there are multiple invalid lines,
+ * return true and set the way_num variable to the index of the least recently used line
+ * 
+ * @param ip_index The index of the cache line to be invalidated.
+ * @param n_op 0 for data, 1 for instruction
+ * 
+ * @return The way number of the line that is being invalidated.
+ */
 int lru_invalid_line(uint16_t ip_index, uint8_t n_op)
 {
 	int least = way_num, mesi;
@@ -67,6 +92,15 @@ int lru_invalid_line(uint16_t ip_index, uint8_t n_op)
 	return least;
 }
 
+/**
+ * If there is only one line in the set that is in the invalid state, then return true. Otherwise,
+ * return false
+ * 
+ * @param index The index of the cache block to be invalidated.
+ * @param n 0 for data, 1 for instruction
+ * 
+ * @return The way number of the line that is being invalidated.
+ */
 bool invalid_line(uint16_t index, uint8_t n)
 {
 	uint8_t mesi_state, count = 0;
@@ -106,6 +140,10 @@ bool invalid_line(uint16_t index, uint8_t n)
 		return false;
 }
 
+/**
+ * This function sets the LRU values of the data and instruction cache to
+ * 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 respectively
+ */
 void set_lru ()
 {
     for(int i=0; i<SETS; i++)
@@ -123,6 +161,15 @@ void set_lru ()
         }
     }
 }
+
+/**
+ * UpdateLRUData(index,way)
+ * 
+ * This function updates the LRU_data array for the given index and way
+ * 
+ * @param index The index of the cache block we're updating.
+ * @param way the way of the cache block
+ */
 void UpdateLRUData(uint16_t index,int way)
 {
    uint8_t lru = LRU_data[index][way];
@@ -134,6 +181,12 @@ void UpdateLRUData(uint16_t index,int way)
    LRU_data[index][way]=MRU_DATA;
 }
 
+/**
+ * UpdateLRUInstr() updates the LRU bits for the instruction cache
+ * 
+ * @param index The index of the cache block we're updating.
+ * @param way the way of the cache block we want to update
+ */
 void UpdateLRUInstr(uint16_t index, int way)
 {
     uint16_t lru = LRU_instruction[index][way];
@@ -145,6 +198,9 @@ void UpdateLRUInstr(uint16_t index, int way)
     LRU_instruction[index][way]=MRU_INSTR;
 }
 
+/**
+ * Clear the instruction and data cache, and reset the LRU bits
+ */
 void clear_reset(void)
 {
 	memset(instruction_cache, 0, CACHE_SIZE_INSTR);
@@ -153,6 +209,14 @@ void clear_reset(void)
 }
 
 
+/**
+ * Reads a file of addresses and stores them in an array
+ * 
+ * @param filename the name of the file to read from
+ * @param size the size of the array
+ * 
+ * @return An array of addresses.
+ */
 address_t *read_file(const char *filename, int *size)
 {
 	FILE *fp;		   // declare filepointer
@@ -194,6 +258,15 @@ address_t *read_file(const char *filename, int *size)
 	return number;
 }
 
+/**
+ * The cache_behaviour function is used to update the MESI state of the cache line
+ * 
+ * @param N 0 for read, 1 for write, 2 for instruction fetch
+ * @param index The index of the cache block to be accessed.
+ * @param way_num the number of the way in the set
+ * @param addr The address of the cache line that is being accessed.
+ * @param mode 0 for data, 1 for instruction
+ */
 void cache_behaviour(int N, uint16_t index, int way_num, uint32_t addr,int mode)
 {
     
@@ -242,6 +315,9 @@ void cache_behaviour(int N, uint16_t index, int way_num, uint32_t addr,int mode)
 }
 
 
+/**
+ * Prints out the number of hits, misses, reads, and writes
+ */
 void print_hit_miss(void)
 {
 	printf("----------------------------------------------------\n");
@@ -257,6 +333,9 @@ void print_hit_miss(void)
 	printf("----------------------------------------------------\n");
 }
 
+/**
+ * Prints the state of all the lines in the data and instruction cache
+ */
 void print_accessed_lines(void)
 {
 	char state;
@@ -302,44 +381,15 @@ void print_accessed_lines(void)
     printf("\n");
 }
 
-// from: https://stackoverflow.com/questions/8257714/how-to-convert-an-int-to-string-in-c
+
 /**
- * C++ version 0.4 char* style "itoa":
- * Written by Lukás Chmela
- * Released under GPLv3.
+ * Given a cache index and a number of ways, return the index of the least recently used way
+ * 
+ * @param index the index of the cache block we're looking at
+ * @param n 1 for data, 2 for instruction
+ * 
+ * @return The index of the line that is being replaced.
  */
-// char *itoa(int value, char *result, int base)
-// {
-// 	// check that the base if valid
-// 	if (base < 2 || base > 36)
-// 	{
-// 		*result = '\0';
-// 		return result;
-// 	}
-
-// 	char *ptr = result, *ptr1 = result, tmp_char;
-// 	int tmp_value;
-
-// 	do
-// 	{
-// 		tmp_value = value;
-// 		value /= base;
-// 		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + (tmp_value - value * base)];
-// 	} while (value);
-
-// 	// Apply negative sign
-// 	if (tmp_value < 0)
-// 		*ptr++ = '-';
-// 	*ptr-- = '\0';
-// 	while (ptr1 < ptr)
-// 	{
-// 		tmp_char = *ptr;
-// 		*ptr-- = *ptr1;
-// 		*ptr1++ = tmp_char;
-// 	}
-// 	return result;
-// }
-
 int victim_line(uint16_t index, uint8_t n){
 
 	if(n == 1 || n == 0) {

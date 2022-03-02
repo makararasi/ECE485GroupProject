@@ -10,6 +10,7 @@
 #include <inttypes.h>
 
 
+
 #define MRU_DATA                               (WAYS_DATA - 1)
 #define MRU_INSTR                             (WAYS_INSTR - 1)
 #define LRU                                                0
@@ -25,12 +26,17 @@
 
 
 //MESI states:-
+/* This is a way to define the MESI states. */
 #define I					0
 #define M					1
 #define E					2
 #define S					3
 
 //Data structures:-
+/**
+ * The union is used to store the address of the file in a 32 bit memory space.
+ *
+ */
 typedef union                                                                           //this union will have 32 bits memory space allocated to it
 {
 	struct __attribute__((__packed__))
@@ -42,6 +48,7 @@ typedef union                                                                   
 	uint32_t addr_store;            // we will store the retrived address from the file and will access them by the size we need (as given in the above structure).
 } input_addr;
 
+/* This is a way to define the MESI states. */
 typedef struct __attribute__((__packed__))             //this structure will have 16 bits allocated to it.
 {
 	uint16_t tag_store:12;
@@ -50,6 +57,9 @@ typedef struct __attribute__((__packed__))             //this structure will hav
 	bool line_accessed:1;
 } stored_data;
 
+/**
+ * 
+ */
 typedef struct address_s
 {
     int n;
@@ -71,36 +81,52 @@ uint8_t LRU_data[SETS][WAYS_DATA];
 uint8_t lru_count[SETS][WAYS_DATA];
 
 //Function definitions :-
+/* This function is checking if the tag is valid or not. */
 bool valid_tag(uint8_t mesi);
 
+/* This function is checking if the tag is valid or not. */
 bool hit_or_miss(uint16_t tag_select, uint16_t ip_index, uint8_t op_n );
 
+/* This function is checking if the line is invalid or not. */
 int lru_invalid_line(uint16_t ip_index, uint8_t n_op);
 
+/* This function is checking if the line is invalid or not. */
 bool invalid_line(uint16_t index, uint8_t n);
 
+/* This function is reading the file and storing the address of the file in the address_t structure. */
 address_t *read_file(const char *filename, int *size);
 
+/* This function is used to convert the integer value to string. */
 char *itoa(int value, char *result, int base);
 
+/* This function is checking if the line is valid or not. */
 bool lru_counter_instruction(int index, int way_num);
 
+/* This function is checking if the line is valid or not. */
 bool lru_counter_data(int index, int way_num);
 
+/* This function is used to check the cache behaviour. */
 void cache_behaviour(int N, uint16_t index, int way_num,uint32_t addr,int mode);
 
+/* This function is used to print the hit and miss count. */
 void print_hit_miss(void);
 
+/* This function is used to print the accessed lines. */
 void print_accessed_lines(void);
 
+/* This function is used to reset the cache. */
 void clear_reset(void);
 
+/* This function is updating the LRU counter for the instruction cache. */
 void UpdateLRUInstr(uint16_t index, int way);
 
+/* This function is updating the LRU counter for the data cache. */
 void UpdateLRUData(uint16_t index,int way);
 
+/* This function is used to set the LRU counter for the data cache. */
 void set_lru ();
 
+/* This function is used to find the victim line for the data cache. */
 int victim_line(uint16_t index, uint8_t n);
 
 

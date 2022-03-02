@@ -2,5 +2,6 @@
     "files.associations": {
         "stdint.h": "c",
         "defines.h": "c"
-    }
+    },
+    "docwriter.style": "Doxygen"
 }
