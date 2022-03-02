@@ -1,174 +1,166 @@
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-
-#define FILENAME "testFile.txt"
-#define SETS 16 * 1024            // Same number of sets for both cache.
-#define WAYS_DATA 8               // ways for data cache
-#define WAYS_INSTR 4              // ways for instruction cache
-#define BYTES sizeof(stored_data) // these three extra lines are for our calculations.
-#define CACHE_SIZE_DATA (SETS * WAYS_DATA * BYTES)
-#define CACHE_SIZE_INSTR (SETS * WAYS_INSTR * BYTES)
-
-typedef struct address_s
-{
-    int n;
-    long addr;
-} address_t, *addressPtr_t;
-
-address_t *read_file(const char *filename, int *size);
-char *itoa(int value, char *result, int base);
-
-typedef union // this union will have 32 bits memory space allocated to it
-{
-    struct __attribute__((__packed__))
-    {
-        u_int8_t snoop : 2;
-        u_int8_t byte : 4;
-        u_int16_t index : 14;
-        u_int16_t tag : 12;
-    } bits;
-    u_int32_t addr_store; // we will store the retrived address from the file and will access them by the size we need (as given in the above structure).
-} input_addr;
-
-typedef struct __attribute__((__packed__)) // this structure will have 16 bits allocated to it.
-{
-    u_int16_t tag_store : 12;
-    u_int8_t MESI : 2;
-    u_int8_t reserved : 2;
-} stored_data;
-
-stored_data instruction_cache[SETS][WAYS_INSTR]; // to store instruction cache line data which are of type stored_data (structure).
-stored_data data_cache[SETS][WAYS_DATA];         // to store data cache line .
+#include <stdint.h>
+#include "Defines.h"
+#include <inttypes.h>
 
 int main()
 {
+	int N, mode;
+	int size; // Size to read
+	input_addr given_addr;
+	uint16_t index_sel, tag_sel;
 
-    int N;
-    long address;
-    input_addr given_addr;
-    u_int8_t snoop_sel;
-    u_int16_t index_sel, tag_sel;
+	// program requires 2 modes.  Here we ask the user to choose which mode
+	// mode can only be 0 or 1
+	bool modeSel = false;
+	while (!modeSel)
+	{
 
-    memset(instruction_cache, 0, CACHE_SIZE_INSTR); // it will set our cache to all zeros to start with.
-    memset(data_cache, 0, CACHE_SIZE_DATA);
+		printf("Enter the desired mode :- ");
+		scanf("%d", &mode);
+		if (mode == 0 || mode == 1)
+		{
+			printf("the desired mode is :- %d\n", mode);
+			modeSel = true;
+		}
+		else
+		{
+			printf("The mode can eiter be 0 or 1\n  Try again.\n");
+		}
+	}
+	memset(instruction_cache, 0, CACHE_SIZE_INSTR); // it will set our cache to all zeros to start with.
+	memset(data_cache, 0, CACHE_SIZE_DATA);
+	set_lru();
 
-    // we can start our file open from here
-    // once we get our N (traces operation) we can atore it in N variable to select which operation we need to do.
-    // after N we will get our address which will be store in the format given bellow.
-    int size; // Size of array read
-    addressPtr_t array = read_file(FILENAME, &size);
+	// Open a file and read input line by line
+	// load data into a structure called array
+	// data will be divided into N and address
+	addressPtr_t array = read_file(FILE_NAME, &size);
 
-    // assigning input address into the structure. this is done after we read data from the file and when we have got N and address separately.
-    // given_addr.addr_store = address;
+	for (int i = 0; i < size; i++)
+	{
+		// Assign address to data structure
+		given_addr.addr_store = array[i].addr;
+		// assign data from structure to specific variables
+		N = array[i].n;
+		index_sel = given_addr.bits.index; // index_sel will get the bits from 6-19.
+		tag_sel = given_addr.bits.tag;	   // tag_sel will get the bits 20-31.
 
-    // This is just to test the loading of the bits in the data structure.
-    // it works. 
-    for (int i = 0; i < size; i++)
-    {
-        char temp[33]; // 32 bits +1 for null terminator
-        given_addr.addr_store = array[i].addr;
-        printf("element: %d\n", i);
-        printf("N bit: %d\n", array[i].n);
-        printf("full address HEX: %x\n", given_addr.addr_store);
-        printf("snoop HEX: %x\n", given_addr.bits.snoop);
-        itoa(given_addr.bits.snoop, temp, 2);
-        printf("snoop BIN: %s\n", temp);
-        printf("byte HEX: %x\n", given_addr.bits.byte);
-        itoa(given_addr.bits.byte, temp, 2);
-        printf("byte BIN: %s\n", temp);
-        printf("index HEX: %x\n", given_addr.bits.index);
-        itoa(given_addr.bits.index, temp, 2);
-        printf("index BIN: %s\n", temp);
-        printf("tag HEX: %x\n", given_addr.bits.tag);
-        itoa(given_addr.bits.tag, temp, 2);
-        printf("tag BIN: %s\n", temp);
-    }
+		// Check the value of N and proceed according to given parameters
 
-    // after we have store our address in given_addr which is of type input_addr.  now we are extracting the desired bits we need.
-    snoop_sel = given_addr.bits.snoop; // snoop_sel will get the bits LSB 0 and 1 position.
-    index_sel = given_addr.bits.index; // index_sel will get the bits from 6-19.
-    tag_sel = given_addr.bits.tag;     // tag_sel will get the bits 20-31.
+		// check if hit or miss
+		if (N == 0 || N == 1)
+		{
+			if (hit_or_miss(tag_sel, index_sel, N))
+			{
+				// increment hit value
+				hits++;
+				// update MESI bits and reads/writes
+				cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+				// update LRU bits
+				UpdateLRUData(index_sel, way_num);
+				// make note that this line was accessed
+				data_cache[index_sel][way_num].line_accessed = 1;
+			}
+			else
+			{
+				// increment miss value
+				misses++;
+				// if mode 1 print relavent data
+				if (mode == 1 && N == 0)
+					printf("Read data from L2 <%x>\n", array[i].addr);
+				if (mode == 1 && N == 1)
+					printf("Read for Ownership from L2 <%x>\n", array[i].addr);
+				// find invalid lines
+				if (invalid_line(index_sel, N))
+				{
+					// update LRU bits
+					UpdateLRUData(index_sel, way_num);
+					// update tag
+					data_cache[index_sel][way_num].tag_store = tag_sel;
+					// update MESI bits and reads/writes
+					cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+					// make note that this line was accessed
+					data_cache[index_sel][way_num].line_accessed = 1;
+				}
+				else // Evict the LRU cache
+				{
+					// find victim cache line
+					way_num = victim_line(index_sel, N);
+					// if mode 1 print relavent information
+					if (mode == 1 && data_cache[index_sel][way_num].MESI == M)
+						printf("write to L2 <%x>\n", array[i].addr);
+					// update tag
+					data_cache[index_sel][way_num].tag_store = tag_sel;
+					// update LRU bits
+					UpdateLRUData(index_sel, way_num);
+					// update MESI bit
+					data_cache[index_sel][way_num].MESI = I;
+					// update MESI bits and reads/writes
+					cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+					// make note that this line was accessed
+					data_cache[index_sel][way_num].line_accessed = 1;
+				}
+			}
+		}
+		// update MESI, tag, and lru for instruction cache
+		else if (N == 2)
+		{
+			if (hit_or_miss(tag_sel, index_sel, N))
+			{
+				hits++;
+				cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+				UpdateLRUInstr(index_sel, way_num);
+				instruction_cache[index_sel][way_num].line_accessed = 1;
+			}
+			else
+			{
 
-    return 0;
-}
+				if (mode == 1)
+					printf("Read data from L2 <%x>\n", array[i].addr);
+				misses++;
+				if (invalid_line(index_sel, N))
+				{
+					UpdateLRUInstr(index_sel, way_num);
+					instruction_cache[index_sel][way_num].tag_store = tag_sel;
+					cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+					instruction_cache[index_sel][way_num].line_accessed = 1;
+				}
+				else
+				{
+					way_num = victim_line(index_sel, N);
+					if (mode == 1 && instruction_cache[index_sel][way_num].MESI == M)
+						printf("write to L2 <%x>\n", array[i].addr);
+					instruction_cache[index_sel][way_num].tag_store = tag_sel;
+					UpdateLRUInstr(index_sel, way_num);
+					instruction_cache[index_sel][way_num].MESI = I;
+					cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+					instruction_cache[index_sel][way_num].line_accessed = 1;
+				}
+			}
+		}
+		//L2 is involved
+		else if (N == 3 || N == 4)
+		{
+			if (hit_or_miss(tag_sel, index_sel, N))
+			{
+				cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+			}
+		}
+		// Clear the cache and reset all states
+		else if (N == 8)
+		{
+			clear_reset();
+		}
+		// print contents of cache
+		else if (N == 9)
+		{
+			print_accessed_lines();
+		}
+	}
+	print_hit_miss();
 
-address_t *read_file(const char *filename, int *size)
-{
-    FILE *fp;          // declare filepointer
-    char *line = NULL; // input line from file variable
-    size_t len = 0;
-    ssize_t read;        // number of characters read on the line
-    char *ptr;           // this isn't really used. But holds chars that aren't in the number
-    address_t *number = NULL; // the array of addresses read
-    int numElements = 0; // size of the array
-
-    fp = fopen(FILENAME, "r");
-    if (fp == NULL)
-        exit(EXIT_FAILURE);
-    // read to the end of the file line by line
-    while ((read = getline(&line, &len, fp)) != -1)
-    {
-        
-
-        numElements++;
-        number = realloc(number, numElements * sizeof(address_t));
-        char temp[2];
-        char temp2[10];
-        strncpy(temp, line, 2);
-        
-        number[numElements - 1].n = atoi(temp);
-        strcpy(temp2,line+2);
-        
-        number[numElements - 1].addr = strtol(temp2, &ptr, 16);
-        
-         
-    }
-    fclose(fp);
-    if (line)
-    {
-        free(line);
-    }
-    *size = numElements;
-    return number;
-}
-
-// from: https://stackoverflow.com/questions/8257714/how-to-convert-an-int-to-string-in-c
-/**
- * C++ version 0.4 char* style "itoa":
- * Written by Lukás Chmela
- * Released under GPLv3.
- */
-char *itoa(int value, char *result, int base)
-{
-    // check that the base if valid
-    if (base < 2 || base > 36)
-    {
-        *result = '\0';
-        return result;
-    }
-
-    char *ptr = result, *ptr1 = result, tmp_char;
-    int tmp_value;
-
-    do
-    {
-        tmp_value = value;
-        value /= base;
-        *ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + (tmp_value - value * base)];
-    } while (value);
-
-    // Apply negative sign
-    if (tmp_value < 0)
-        *ptr++ = '-';
-    *ptr-- = '\0';
-    while (ptr1 < ptr)
-    {
-        tmp_char = *ptr;
-        *ptr-- = *ptr1;
-        *ptr1++ = tmp_char;
-    }
-    return result;
+	return 0;
 }
