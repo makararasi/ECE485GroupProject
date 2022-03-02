@@ -213,8 +213,7 @@ void clear_reset(void)
 /******************************************************
  * Reads a file of addresses and returns an array of addresses
  * 
- * Inputs: filename pointer to the name of the file to be read
- * Inputs: size the size of the array
+ * Inputs: filename (pointer to the name of the file to be read), size (pointer to the size of the array)
  * Output: An array of addresses.
 *******************************************************/
 address_t *read_file(const char *filename, int *size)
@@ -265,11 +264,8 @@ address_t *read_file(const char *filename, int *size)
  * If N = 3, data_cache[index][way_num].MESI is set to I.
  * If N = 4, data_cache[index][way_num].MESI is set to I
  * 
- * Inputs: N 0 for read, 1 for write, 2 for instruction fetch
- * Inputs: index the index of the cache block to be accessed (from 0 to N-1)
- * Inputs: way_num the number of the way in the set
- * Inputs: addr the address of the cache line we want to access
- * Inputs: mode 0 for data, 1 for instruction
+ * Inputs: N (operation N from trace file), index (the index of the cache block to be accessed (from 0 to N-1)),
+ * Inputs: way_num (the number of the way in the set),addr (the address of the cache line we want to access), mode (0 for data, 1 for instruction)
  * Output: None
 *******************************************************/
 void cache_behaviour(int N, uint16_t index, int way_num, uint32_t addr,int mode)
@@ -331,7 +327,7 @@ void print_hit_miss(void)
 }
 
 /******************************************************
-* Prints the Data of cache lines which wwhere accessed. 
+* Prints the Data of cache lines which were accessed. 
 * Inputs: None
 * Output: None
 *******************************************************/
