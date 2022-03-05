@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "stdint.h": "c",
-        "defines.h": "c"
+        "defines.h": "c",
+        "inttypes.h": "c"
     },
     "docwriter.style": "Doxygen",
     "docwriter.progress.trackFunctions": true,

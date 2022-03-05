@@ -55,11 +55,15 @@ int main()
 		tag_sel = given_addr.bits.tag;	   // tag_sel will get the bits 20-31.
 
 		// Check the value of N and proceed according to given parameters
-
+		D printf("\nCurrent line number: %d\n", i);
+		D printf("Current operation: %d\n", N);
+		D printf("Current address: %x\n", array[i].addr);
 		if (N == 0 || N == 1)
 		{ // check if hit or miss
+			D printf("N was either 0 or 1\n");
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
+				D printf("We had a HIT!!\n");
 				// increment hit value
 				hits++;
 				// update MESI bits and reads/writes
@@ -71,20 +75,24 @@ int main()
 			}
 			else
 			{
+				D printf("We had a MISS!!\n");
 				// increment miss value
 				misses++;
 				// if mode 1 print relavent data
 				if (mode == 1 && N == 0)
 				{
+					D printf("N is 0\n");
 					printf("Read data from L2 <%x>\n", array[i].addr);
 				}
 				if (mode == 1 && N == 1)
 				{
+					D printf("N is 1\n");
 					printf("Read for Ownership from L2 <%x>\n", array[i].addr);
 				}
 				// find invalid lines
 				if (invalid_line(index_sel, N))
 				{
+					D printf("Invalid line");
 					// update LRU bits
 					UpdateLRUData(index_sel, way_num);
 					// update tag
@@ -96,11 +104,13 @@ int main()
 				}
 				else // Evict the LRU cache line.
 				{
+					D printf("We didn't have an invalid line... evicting\n");
 					// find victim cache line
 					way_num = victim_line(index_sel, N);
 					// if mode 1 print relavent information
 					if (mode == 1 && data_cache[index_sel][way_num].MESI == M)
 					{
+						D printf("ONLY PRINTING IF MODE IS 1\n");
 						printf("Write to L2 <%x>\n", array[i].addr);
 					}
 					// update tag
@@ -119,8 +129,10 @@ int main()
 		// update MESI, tag, and lru for instruction cache
 		else if (N == 2)
 		{
+			D printf("N is 2\n");
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
+				D printf("We had a HIT!!\n");
 				hits++;
 				cache_behaviour(N, index_sel, way_num);
 				UpdateLRUInstr(index_sel, way_num);
@@ -128,14 +140,16 @@ int main()
 			}
 			else
 			{
-
+				D printf("We had a MISS!!\n");
 				if (mode == 1)
 				{
+
 					printf("Read data from L2 <%x>\n", array[i].addr);
 				}
 				misses++;
 				if (invalid_line(index_sel, N))
 				{
+					D printf("Invalid line!\n");
 					UpdateLRUInstr(index_sel, way_num);
 					instruction_cache[index_sel][way_num].tag_store = tag_sel;
 					cache_behaviour(N, index_sel, way_num);
@@ -143,6 +157,7 @@ int main()
 				}
 				else
 				{
+					D printf("Line is valid Evicting!\n");
 					way_num = victim_line(index_sel, N);
 					if (mode == 1 && instruction_cache[index_sel][way_num].MESI == M)
 					{
@@ -159,10 +174,13 @@ int main()
 		// Behavior according to snoop
 		else if (N == 3 || N == 4)
 		{
+			D printf("N is 3 or 4\n");
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
+				D printf("We had a HIT!!\n");
 				if (N == 4 && mode == 1 && data_cache[index_sel][way_num].MESI == M)
 				{
+					D printf("N is 4 and MODE is 1\n");
 					printf("Return data to L2 <%x>\n", array[i].addr);
 				}
 				cache_behaviour(N, index_sel, way_num);
@@ -171,13 +189,17 @@ int main()
 		// Clear the cache and reset all states
 		else if (N == 8)
 		{
+			D printf("N is 8\n");
 			clear_reset();
 		}
 		// print contents of cache lines which were accessed.
 		else if (N == 9)
 		{
+			printf("N is 9\n");
 			print_accessed_lines();
 		}
+
+		D printf("\n--------------------------------------------\n--------------------------------------------\n");
 	}
 	print_hit_miss();
 

@@ -229,7 +229,7 @@ address_t *read_file(const char *filename, int *size)
 	if (fp == NULL){
 		exit(EXIT_FAILURE);
 	}
-
+	int lineNum = 0;
 	while ((read = getline(&line, &len, fp)) != -1)
 	{
 
@@ -246,6 +246,8 @@ address_t *read_file(const char *filename, int *size)
 		}
 
 		number[numElements - 1].addr = strtol(temp2, &ptr, 16);
+		D printf("\nREADING Line #%d Element #%d: %x\nBinary EQ:", lineNum++, numElements, number[numElements - 1].addr);
+		D printBits(sizeof(uint32_t), &number[numElements - 1].addr);
 	}
 	fclose(fp);
 	if (line)
@@ -393,4 +395,27 @@ int victim_line(uint16_t index, uint8_t n){
 		}
 	}
 	return 0;
+}
+
+
+// Assumes little endian
+/**
+ * Prints the bits of a byte array
+ * 
+ * @param size The size of the memory block, in bytes.
+ * @param ptr The pointer to the data to print.
+ */
+void printBits(size_t const size, void const * const ptr)
+{
+    unsigned char *b = (unsigned char*) ptr;
+    unsigned char byte;
+    int i, j;
+    
+    for (i = size-1; i >= 0; i--) {
+        for (j = 7; j >= 0; j--) {
+            byte = (b[i] >> j) & 1;
+            printf("%u", byte);
+        }
+    }
+    puts("");
 }

@@ -8,6 +8,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <inttypes.h>
+#define DEBUG 1
+
+#ifdef DEBUG
+ #define D if(1) 
+#else
+ #define D if(0) 
+#endif
 
 
 #define MRU_DATA                               (WAYS_DATA - 1)
@@ -119,5 +126,7 @@ void set_lru ();
 /* This function is checking if the line is valid or not. */
 int victim_line(uint16_t index, uint8_t n);
 
+/* This function is printing the bits of the address. */
+void printBits(size_t const size, void const * const ptr);
 
 #endif
