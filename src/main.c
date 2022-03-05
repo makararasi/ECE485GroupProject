@@ -56,15 +56,14 @@ int main()
 
 		// Check the value of N and proceed according to given parameters
 
-		// check if hit or miss
 		if (N == 0 || N == 1)
-		{
+		{ // check if hit or miss
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
 				// increment hit value
 				hits++;
 				// update MESI bits and reads/writes
-				cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+				cache_behaviour(N, index_sel, way_num);
 				// update LRU bits
 				UpdateLRUData(index_sel, way_num);
 				// make note that this line was accessed
@@ -76,9 +75,13 @@ int main()
 				misses++;
 				// if mode 1 print relavent data
 				if (mode == 1 && N == 0)
+				{
 					printf("Read data from L2 <%x>\n", array[i].addr);
+				}
 				if (mode == 1 && N == 1)
+				{
 					printf("Read for Ownership from L2 <%x>\n", array[i].addr);
+				}
 				// find invalid lines
 				if (invalid_line(index_sel, N))
 				{
@@ -87,25 +90,27 @@ int main()
 					// update tag
 					data_cache[index_sel][way_num].tag_store = tag_sel;
 					// update MESI bits and reads/writes
-					cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+					cache_behaviour(N, index_sel, way_num);
 					// make note that this line was accessed
 					data_cache[index_sel][way_num].line_accessed = 1;
 				}
-				else // Evict the LRU cache
+				else // Evict the LRU cache line.
 				{
 					// find victim cache line
 					way_num = victim_line(index_sel, N);
 					// if mode 1 print relavent information
 					if (mode == 1 && data_cache[index_sel][way_num].MESI == M)
-						printf("write to L2 <%x>\n", array[i].addr);
+					{
+						printf("Write to L2 <%x>\n", array[i].addr);
+					}
 					// update tag
 					data_cache[index_sel][way_num].tag_store = tag_sel;
 					// update LRU bits
 					UpdateLRUData(index_sel, way_num);
-					// update MESI bit
+					// update previous MESI bits to I.
 					data_cache[index_sel][way_num].MESI = I;
 					// update MESI bits and reads/writes
-					cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+					cache_behaviour(N, index_sel, way_num);
 					// make note that this line was accessed
 					data_cache[index_sel][way_num].line_accessed = 1;
 				}
@@ -117,7 +122,7 @@ int main()
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
 				hits++;
-				cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+				cache_behaviour(N, index_sel, way_num);
 				UpdateLRUInstr(index_sel, way_num);
 				instruction_cache[index_sel][way_num].line_accessed = 1;
 			}
@@ -125,34 +130,42 @@ int main()
 			{
 
 				if (mode == 1)
+				{
 					printf("Read data from L2 <%x>\n", array[i].addr);
+				}
 				misses++;
 				if (invalid_line(index_sel, N))
 				{
 					UpdateLRUInstr(index_sel, way_num);
 					instruction_cache[index_sel][way_num].tag_store = tag_sel;
-					cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+					cache_behaviour(N, index_sel, way_num);
 					instruction_cache[index_sel][way_num].line_accessed = 1;
 				}
 				else
 				{
 					way_num = victim_line(index_sel, N);
 					if (mode == 1 && instruction_cache[index_sel][way_num].MESI == M)
-						printf("write to L2 <%x>\n", array[i].addr);
+					{
+						printf("Write to L2 <%x>\n", array[i].addr);
+					}
 					instruction_cache[index_sel][way_num].tag_store = tag_sel;
 					UpdateLRUInstr(index_sel, way_num);
 					instruction_cache[index_sel][way_num].MESI = I;
-					cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+					cache_behaviour(N, index_sel, way_num);
 					instruction_cache[index_sel][way_num].line_accessed = 1;
 				}
 			}
 		}
-		//L2 is involved
+		// Behavior according to snoop
 		else if (N == 3 || N == 4)
 		{
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
-				cache_behaviour(N, index_sel, way_num, array[i].addr, mode);
+				if (N == 4 && mode == 1 && data_cache[index_sel][way_num].MESI == M)
+				{
+					printf("Return data to L2 <%x>\n", array[i].addr);
+				}
+				cache_behaviour(N, index_sel, way_num);
 			}
 		}
 		// Clear the cache and reset all states
@@ -160,7 +173,7 @@ int main()
 		{
 			clear_reset();
 		}
-		// print contents of cache
+		// print contents of cache lines which were accessed.
 		else if (N == 9)
 		{
 			print_accessed_lines();

@@ -165,7 +165,7 @@ void set_lru ()
 
 /**********************************************************
 * Updates LRU bits whenever we access a line in Data cache.
-* Inputs: None
+* Inputs: index (comes from the address), way_num
 * Output: None
 ***********************************************************/
 void UpdateLRUData(uint16_t index,int way)
@@ -182,7 +182,7 @@ void UpdateLRUData(uint16_t index,int way)
 
 /*****************************************************************
 * Updates LRU bits whenever we access a line in Instruction cache.
-* Inputs: None
+* Inputs: index (comes from the address), way_num
 * Output: None
 ******************************************************************/
 void UpdateLRUInstr(uint16_t index, int way)
@@ -211,8 +211,7 @@ void clear_reset(void)
 
 
 /******************************************************
- * Reads a file of addresses and returns an array of addresses
- * 
+ * Reads a file of addresses and returns an array of addresses.
  * Inputs: filename (pointer to the name of the file to be read), size (pointer to the size of the array)
  * Output: An array of addresses.
 *******************************************************/
@@ -261,14 +260,12 @@ address_t *read_file(const char *filename, int *size)
  * If N = 0, read_result is incremented.
  * If N = 1, write_result is incremented.
  * If N = 2, read_result is incremented.
- * If N = 3, data_cache[index][way_num].MESI is set to I.
- * If N = 4, data_cache[index][way_num].MESI is set to I
+ * If N = 3 || 4, data_cache[index][way_num].MESI is set to I.
  * 
- * Inputs: N (operation N from trace file), index (the index of the cache block to be accessed (from 0 to N-1)),
- * Inputs: way_num (the number of the way in the set),addr (the address of the cache line we want to access), mode (0 for data, 1 for instruction)
+ * Inputs: N (operation N from trace file), index (comes from the address), way_num (way in the set).
  * Output: None
 *******************************************************/
-void cache_behaviour(int N, uint16_t index, int way_num, uint32_t addr,int mode)
+void cache_behaviour(int N, uint16_t index, int way_num)
 {
     
 	if (N == 0)
@@ -298,9 +295,6 @@ void cache_behaviour(int N, uint16_t index, int way_num, uint32_t addr,int mode)
 	}
 	else if (N == 3 || N == 4)
 	{   
-        if(N == 4 && mode == 1 && data_cache[index][way_num].MESI == M){
-            printf("Read data to L2 <%x>\n",addr);
-        }
 		data_cache[index][way_num].MESI = I;
 	}
 }

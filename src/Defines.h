@@ -96,7 +96,7 @@ bool lru_counter_instruction(int index, int way_num);
 bool lru_counter_data(int index, int way_num);
 
 /* This function is checking if the line is valid or not. */
-void cache_behaviour(int N, uint16_t index, int way_num,uint32_t addr,int mode);
+void cache_behaviour(int N, uint16_t index, int way_num);
 
 /* This function is printing the hit and miss count. */
 void print_hit_miss(void);
