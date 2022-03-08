@@ -325,48 +325,50 @@ void print_hit_miss(void)
 *******************************************************/
 void print_accessed_lines(void)
 {
-	char state;
-	uint8_t lru;
-	uint16_t tag;
-	printf("Accessed lines of DATA CACHE : \n");
-	printf("Index\tWays\tState\tLRU\tTag\n");
-	for(int i = 0; i < SETS; i++)
-	{	for(int j = 0; j < WAYS_DATA; j++)
-		{	if (data_cache[i][j].MESI == I){
-				state = 'I';}
-			else if (data_cache [i][j].MESI == M){
-				state = 'M';}
-			else if (data_cache [i][j].MESI == E){
-				state = 'E';}
-			else if (data_cache [i][j].MESI == S){
-				state = 'S';}
-			tag = data_cache [i][j].tag_store;
-			lru = LRU_data[i][j];
-			if (data_cache[i][j].line_accessed){
-				printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
-			}
-		}
-	}
-    printf("\n");
-	printf("Accessed lines of INSTRUCTION CACHE : \n");
-	printf("Index\tWays\tState\tLRU\tTag\n");
-	for(int i = 0; i < SETS; i++)
-	{	for(int j = 0; j < WAYS_INSTR; j++)
-		{	if (instruction_cache[i][j].MESI == I){
-				state = 'I';}
-			else if (instruction_cache[i][j].MESI == M){
-				state = 'M';}
-			else if (instruction_cache[i][j].MESI == E){
-				state = 'E';}
-			else if (instruction_cache[i][j].MESI == S){
-				state = 'S';}
-			tag = instruction_cache[i][j].tag_store;
-			lru = LRU_instruction[i][j];
-			if (instruction_cache[i][j].line_accessed){
-				printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
-			}
-		}
-	}
+    char state;
+    uint8_t lru;
+    uint16_t tag;
+    printf("*****************************************\n");
+    printf("Accessed lines of DATA CACHE : \n");
+    printf("Index\tWays\tState\tLRU\tTag\n");
+    for(int i = 0; i < SETS; i++)
+    {    for(int j = 0; j < WAYS_DATA; j++)
+        {    if (data_cache[i][j].MESI == I){
+                state = 'I';}
+            else if (data_cache [i][j].MESI == M){
+                state = 'M';}
+            else if (data_cache [i][j].MESI == E){
+                state = 'E';}
+            else if (data_cache [i][j].MESI == S){
+                state = 'S';}
+            tag = data_cache [i][j].tag_store;
+            lru = LRU_data[i][j];
+            if (data_cache[i][j].line_accessed){
+                printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
+            }
+        }
+    }
+    printf("-----------------------------------------\n");
+    printf("Accessed lines of INSTRUCTION CACHE : \n");
+    printf("Index\tWays\tState\tLRU\tTag\n");
+    for(int i = 0; i < SETS; i++)
+    {    for(int j = 0; j < WAYS_INSTR; j++)
+        {    if (instruction_cache[i][j].MESI == I){
+                state = 'I';}
+            else if (instruction_cache[i][j].MESI == M){
+                state = 'M';}
+            else if (instruction_cache[i][j].MESI == E){
+                state = 'E';}
+            else if (instruction_cache[i][j].MESI == S){
+                state = 'S';}
+            tag = instruction_cache[i][j].tag_store;
+            lru = LRU_instruction[i][j];
+            if (instruction_cache[i][j].line_accessed){
+                printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
+            }
+        }
+    }
+    printf("*****************************************\n");
     printf("\n");
 }
 
