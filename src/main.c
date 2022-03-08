@@ -183,7 +183,7 @@ int main()
 					D printf("N is 4 and MODE is 1\n");
 					printf("Return data to L2 <%x>\n", array[i].addr);
 				}
-				cache_behaviour(N, index_sel, way_num);
+				data_cache[index_sel][way_num].MESI = I;
 				UpdateLRUData(index_sel, way_num);
 			}
 		}

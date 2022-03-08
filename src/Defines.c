@@ -295,10 +295,6 @@ void cache_behaviour(int N, uint16_t index, int way_num)
 		else if (instruction_cache[index][way_num].MESI == E){
 			instruction_cache[index][way_num].MESI = S;}
 	}
-	else if (N == 3 || N == 4)
-	{   
-		data_cache[index][way_num].MESI = I;
-	}
 }
 
 
