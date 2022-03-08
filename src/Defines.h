@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <inttypes.h>
-#define DEBUG 1
+//#define DEBUG 1
 
 #ifdef DEBUG
  #define D if(1) 

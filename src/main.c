@@ -184,6 +184,7 @@ int main()
 					printf("Return data to L2 <%x>\n", array[i].addr);
 				}
 				cache_behaviour(N, index_sel, way_num);
+				UpdateLRUData(index_sel, way_num);
 			}
 		}
 		// Clear the cache and reset all states
