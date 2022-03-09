@@ -45,6 +45,7 @@ bool hit_or_miss(uint16_t tag_select, uint16_t ip_index, uint8_t op_n)
 				if (valid_tag(data_cache[ip_index][i].MESI)){
 					return true;
 				}
+				return false;
 			}
 		}
 		else
@@ -58,6 +59,7 @@ bool hit_or_miss(uint16_t tag_select, uint16_t ip_index, uint8_t op_n)
 					if (valid_tag(instruction_cache[ip_index][i].MESI)){
 						return true;
 					}
+					return false;
 				}
 			}
 		}
@@ -288,6 +290,8 @@ void cache_behaviour(int N, uint16_t index, int way_num)
 		read_result++;
 		if (instruction_cache[index][way_num].MESI == I){
 			instruction_cache[index][way_num].MESI = E; }
+		else if (instruction_cache[index][way_num].MESI == M){
+			instruction_cache[index][way_num].MESI = M; }
 		else if (instruction_cache[index][way_num].MESI == E){
 			instruction_cache[index][way_num].MESI = S;}
 	}
@@ -321,48 +325,50 @@ void print_hit_miss(void)
 *******************************************************/
 void print_accessed_lines(void)
 {
-	char state;
-	uint8_t lru;
-	uint16_t tag;
-	printf("Accessed lines of DATA CACHE : \n");
-	printf("Index\tWays\tState\tLRU\tTag\n");
-	for(int i = 0; i < SETS; i++)
-	{	for(int j = 0; j < WAYS_DATA; j++)
-		{	if (data_cache[i][j].MESI == I){
-				state = 'I';}
-			else if (data_cache [i][j].MESI == M){
-				state = 'M';}
-			else if (data_cache [i][j].MESI == E){
-				state = 'E';}
-			else if (data_cache [i][j].MESI == S){
-				state = 'S';}
-			tag = data_cache [i][j].tag_store;
-			lru = LRU_data[i][j];
-			if (data_cache[i][j].line_accessed){
-				printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
-			}
-		}
-	}
-    printf("\n");
-	printf("Accessed lines of INSTRUCTION CACHE : \n");
-	printf("Index\tWays\tState\tLRU\tTag\n");
-	for(int i = 0; i < SETS; i++)
-	{	for(int j = 0; j < WAYS_INSTR; j++)
-		{	if (instruction_cache[i][j].MESI == I){
-				state = 'I';}
-			else if (instruction_cache[i][j].MESI == M){
-				state = 'M';}
-			else if (instruction_cache[i][j].MESI == E){
-				state = 'E';}
-			else if (instruction_cache[i][j].MESI == S){
-				state = 'S';}
-			tag = instruction_cache[i][j].tag_store;
-			lru = LRU_instruction[i][j];
-			if (instruction_cache[i][j].line_accessed){
-				printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
-			}
-		}
-	}
+    char state;
+    uint8_t lru;
+    uint16_t tag;
+    printf("*****************************************\n");
+    printf("Accessed lines of DATA CACHE : \n");
+    printf("Index\tWays\tState\tLRU\tTag\n");
+    for(int i = 0; i < SETS; i++)
+    {    for(int j = 0; j < WAYS_DATA; j++)
+        {    if (data_cache[i][j].MESI == I){
+                state = 'I';}
+            else if (data_cache [i][j].MESI == M){
+                state = 'M';}
+            else if (data_cache [i][j].MESI == E){
+                state = 'E';}
+            else if (data_cache [i][j].MESI == S){
+                state = 'S';}
+            tag = data_cache [i][j].tag_store;
+            lru = LRU_data[i][j];
+            if (data_cache[i][j].line_accessed){
+                printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
+            }
+        }
+    }
+    printf("-----------------------------------------\n");
+    printf("Accessed lines of INSTRUCTION CACHE : \n");
+    printf("Index\tWays\tState\tLRU\tTag\n");
+    for(int i = 0; i < SETS; i++)
+    {    for(int j = 0; j < WAYS_INSTR; j++)
+        {    if (instruction_cache[i][j].MESI == I){
+                state = 'I';}
+            else if (instruction_cache[i][j].MESI == M){
+                state = 'M';}
+            else if (instruction_cache[i][j].MESI == E){
+                state = 'E';}
+            else if (instruction_cache[i][j].MESI == S){
+                state = 'S';}
+            tag = instruction_cache[i][j].tag_store;
+            lru = LRU_instruction[i][j];
+            if (instruction_cache[i][j].line_accessed){
+                printf ("%x\t%d\t%c\t%x\t%x\n", i, j, state, lru, tag);
+            }
+        }
+    }
+    printf("*****************************************\n");
     printf("\n");
 }
 
@@ -381,7 +387,7 @@ int victim_line(uint16_t index, uint8_t n){
 		}
 	}
 	else if(n == 2) {
-		for(int i = 0; i < WAYS_INSTR; i++) {
+		for(int i = 0; i < WAYS_DATA; i++) {
 			if(LRU_instruction[index][i] == LRU){ 
 				return i;}
 		}
@@ -391,12 +397,12 @@ int victim_line(uint16_t index, uint8_t n){
 
 
 // Assumes little endian
-/*************************************************************************
+/**
  * Prints the bits of a byte array
  * 
- * Inputs: size (The size of the memory block, in bytes.), ptr (The pointer to the data to print.)
- * Output: NONE
- **************************************************************************/
+ * @param size The size of the memory block, in bytes.
+ * @param ptr The pointer to the data to print.
+ */
 void printBits(size_t const size, void const * const ptr)
 {
     unsigned char *b = (unsigned char*) ptr;
@@ -410,32 +416,4 @@ void printBits(size_t const size, void const * const ptr)
         }
     }
     puts("");
-}
-
-
-/*************************************************************************
-* Finds the first repeated tag for a set. 
-* Inputs: index, n (operation N from trace file),Tag.
-* Output: Bool. 
-**************************************************************************/
-
-
-bool same_tag(uint16_t index, uint8_t n, uint16_t tag)
-{
-    for(int i = 0; i < WAYS_DATA; i++)
-    {
-        if(n == 0 || n == 1)
-        {    if((tag = data_cache[index][i].tag_store) && data_cache[index][i].MESI == I)
-            {    way_num = i;
-                return true;
-            }
-        }
-        else  if((i < WAYS_INSTR) && (n == 2))
-        {    if((tag = instruction_cache[index][i].tag_store) && instruction_cache[index][i].MESI == I)
-            {    way_num = i;
-                return true;
-            }
-        }
-    }
-    return false;
 }
