@@ -19,11 +19,11 @@ MainDUT:
 
 ifeq ($(VERIFICATION),ON)
 clean:
-	rm -rf work/ qverilog.log dump.vcd transcript testFile.txt coverage_debug.txt coverage.txt coverage_final_report.txt MSDCOVER myapp cacheSim
+	rm -rf work/ qverilog.log dump.vcd transcript testFile.txt coverage_debug.txt coverage.txt coverage_final_report.txt MSDCOVER cacheSim
 	clear
 else
 clean:
-	rm -rf work/ qverilog.log dump.vcd transcript coverage.txt coverage_debug.txt coverage_final_report.txt MSDCOVER myapp a.out
+	rm -rf work/ qverilog.log dump.vcd transcript coverage.txt coverage_debug.txt coverage_final_report.txt MSDCOVER cacheSim
 	clear
 endif
 
