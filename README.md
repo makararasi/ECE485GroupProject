@@ -4,16 +4,18 @@
 The aim of this project is to create a simulation of a split L1 Cache for a new 32-bit processor, which can be used concurrently with 3 other processors which share L2 Cache. The system will use MESI protocol.
 <H1>DESIGN SPECIFICATION:</H1>
 - 32-bit processor
-  - 32 address bits
-    - 16k sets
-      - 214 = 16k
-      - ∴ 14 bits required to for address select
-    - 64 byte lines
-      - 26 = 64 
-      - ∴ 6 bits required to for byte select
-    - Tag bits are remaining
-      - 32-14-9=12 
-      - ∴ 12 bits for tag select
+    - 32 address bits
+      - 16k sets
+        - 214 = 16k
+        - ∴ 14 bits required to for address select
+      - 64 byte lines
+        - 26 = 64 
+        - ∴ 6 bits required to for byte select
+      - Tag bits are remaining
+        - 32-14-9=12 
+        - ∴ 12 bits for tag select
+
+        
 Cache coherence
 MESI protocol
 Simulate L1 Split Cache
