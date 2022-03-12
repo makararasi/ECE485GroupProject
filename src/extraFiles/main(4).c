@@ -17,7 +17,6 @@ int main()
 	int size; // Size to read
 	input_addr given_addr;
 	uint16_t index_sel, tag_sel;
-	FILE *fptr;
 
 	// program requires 2 modes.  Here we ask the user to choose which mode
 	// mode can only be 0 or 1
@@ -37,9 +36,6 @@ int main()
 			printf("The mode can eiter be 0 or 1\n  Try again.\n");
 		}
 	}
-
-	C fptr = fopen("coverage.txt", "w+");
-
 	memset(instruction_cache, 0, CACHE_SIZE_INSTR); // it will set our cache to all zeros to start with.
 	memset(data_cache, 0, CACHE_SIZE_DATA);
 	set_lru();
@@ -57,8 +53,8 @@ int main()
 		N = array[i].n;
 		index_sel = given_addr.bits.index; // index_sel will get the bits from 6-19.
 		tag_sel = given_addr.bits.tag;	   // tag_sel will get the bits 20-31.
+
 		// Check the value of N and proceed according to given parameters
-		// printf("Index is %0*x way num is %0d\n",4,index_sel,way_num);
 		D printf("\nCurrent line number: %d\n", i);
 		D printf("Current operation: %d\n", N);
 		D printf("Current address: %x\n", array[i].addr);
@@ -68,18 +64,19 @@ int main()
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
 				D printf("We had a HIT!!\n");
+				// increment hit value
 				hits++;
 				// update MESI bits and reads/writes
 				cache_behaviour(N, index_sel, way_num);
 				// update LRU bits
 				UpdateLRUData(index_sel, way_num);
 				// make note that this line was accessed
-				data_cache[index_sel][way_num].line_accessed = 1; //<TYPEof cache 1 or 0><indexsel><way_num><MESII>
-				C fprintf(fptr, "%0d%0*x%0d%0d\n", 1, 4, index_sel, way_num, data_cache[index_sel][way_num].MESI);
+				data_cache[index_sel][way_num].line_accessed = 1;
 			}
 			else
 			{
 				D printf("We had a MISS!!\n");
+				// increment miss value
 				misses++;
 				// if mode 1 print relavent data
 				if (mode == 1 && N == 0)
@@ -96,20 +93,14 @@ int main()
 				if (invalid_line(index_sel, N))
 				{
 					D printf("Invalid line");
-					if (same_tag(index_sel, N, tag_sel))
-					{
-						UpdateLRUData(index_sel, way_num);
-						cache_behaviour(N, index_sel, way_num);
-						data_cache[index_sel][way_num].line_accessed = 1;
-					}
-					else
-					{
-						UpdateLRUData(index_sel, way_num);
-						cache_behaviour(N, index_sel, way_num);
-						data_cache[index_sel][way_num].line_accessed = 1;
-						data_cache[index_sel][way_num].tag_store = tag_sel;
-					}
-					C fprintf(fptr, "%0d%0*x%0d%0d\n", 1, 4, index_sel, way_num, data_cache[index_sel][way_num].MESI);
+					// update LRU bits
+					UpdateLRUData(index_sel, way_num);
+					// update tag
+					data_cache[index_sel][way_num].tag_store = tag_sel;
+					// update MESI bits and reads/writes
+					cache_behaviour(N, index_sel, way_num);
+					// make note that this line was accessed
+					data_cache[index_sel][way_num].line_accessed = 1;
 				}
 				else // Evict the LRU cache line.
 				{
@@ -122,13 +113,16 @@ int main()
 						D printf("ONLY PRINTING IF MODE IS 1\n");
 						printf("Write to L2 <%x>\n", array[i].addr);
 					}
+					// update tag
 					data_cache[index_sel][way_num].tag_store = tag_sel;
+					// update LRU bits
 					UpdateLRUData(index_sel, way_num);
 					// update previous MESI bits to I.
 					data_cache[index_sel][way_num].MESI = I;
+					// update MESI bits and reads/writes
 					cache_behaviour(N, index_sel, way_num);
+					// make note that this line was accessed
 					data_cache[index_sel][way_num].line_accessed = 1;
-					C fprintf(fptr, "%0d%0*x%0d%0d\n", 1, 4, index_sel, way_num, data_cache[index_sel][way_num].MESI);
 				}
 			}
 		}
@@ -143,7 +137,6 @@ int main()
 				cache_behaviour(N, index_sel, way_num);
 				UpdateLRUInstr(index_sel, way_num);
 				instruction_cache[index_sel][way_num].line_accessed = 1;
-				C fprintf(fptr, "%0d%0*x%0d%0d\n", 0, 4, index_sel, way_num, instruction_cache[index_sel][way_num].MESI);
 			}
 			else
 			{
@@ -157,21 +150,10 @@ int main()
 				if (invalid_line(index_sel, N))
 				{
 					D printf("Invalid line!\n");
-					if (same_tag(index_sel, N, tag_sel))
-					{
-						UpdateLRUInstr(index_sel, way_num);
-						cache_behaviour(N, index_sel, way_num);
-						instruction_cache[index_sel][way_num].line_accessed = 1;
-					}
-					else
-					{
-						UpdateLRUInstr(index_sel, way_num);
-						cache_behaviour(N, index_sel, way_num);
-						instruction_cache[index_sel][way_num].line_accessed = 1;
-						instruction_cache[index_sel][way_num].tag_store = tag_sel;
-					}
-
-					C fprintf(fptr, "%0d%0*x%d%0d\n", 0, 4, index_sel, way_num, instruction_cache[index_sel][way_num].MESI);
+					UpdateLRUInstr(index_sel, way_num);
+					instruction_cache[index_sel][way_num].tag_store = tag_sel;
+					cache_behaviour(N, index_sel, way_num);
+					instruction_cache[index_sel][way_num].line_accessed = 1;
 				}
 				else
 				{
@@ -183,9 +165,9 @@ int main()
 					}
 					instruction_cache[index_sel][way_num].tag_store = tag_sel;
 					UpdateLRUInstr(index_sel, way_num);
-					instruction_cache[index_sel][way_num].MESI = E;
+					instruction_cache[index_sel][way_num].MESI = I;
+					cache_behaviour(N, index_sel, way_num);
 					instruction_cache[index_sel][way_num].line_accessed = 1;
-					C fprintf(fptr, "%0d%0*x%d%0d\n", 0, 4, index_sel, way_num, instruction_cache[index_sel][way_num].MESI);
 				}
 			}
 		}
@@ -201,9 +183,8 @@ int main()
 					D printf("N is 4 and MODE is 1\n");
 					printf("Return data to L2 <%x>\n", array[i].addr);
 				}
-				UpdateLRUData(index_sel, way_num);
 				data_cache[index_sel][way_num].MESI = I;
-				C fprintf(fptr, "%0d%0*x%d%0d\n", 1, 4, index_sel, way_num, data_cache[index_sel][way_num].MESI);
+				UpdateLRUData(index_sel, way_num);
 			}
 		}
 		// Clear the cache and reset all states
@@ -215,13 +196,13 @@ int main()
 		// print contents of cache lines which were accessed.
 		else if (N == 9)
 		{
-			D printf("N is 9\n");
+			printf("N is 9\n");
 			print_accessed_lines();
 		}
 
 		D printf("\n--------------------------------------------\n--------------------------------------------\n");
 	}
 	print_hit_miss();
-	fclose(fptr);
+
 	return 0;
 }

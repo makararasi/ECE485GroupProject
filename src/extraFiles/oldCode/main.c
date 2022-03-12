@@ -65,6 +65,7 @@ int main()
 		if (N == 0 || N == 1)
 		{ // check if hit or miss
 			D printf("N was either 0 or 1\n");
+			D printf("tag_sel: %d\tindex_sel: %d\n",tag_sel,index_sel);
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
 				D printf("We had a HIT!!\n");
@@ -139,7 +140,7 @@ int main()
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
 				D printf("We had a HIT!!\n");
-				hits++;
+				hitsI++;
 				cache_behaviour(N, index_sel, way_num);
 				UpdateLRUInstr(index_sel, way_num);
 				instruction_cache[index_sel][way_num].line_accessed = 1;
@@ -153,19 +154,19 @@ int main()
 
 					printf("Read data from L2 <%x>\n", array[i].addr);
 				}
-				misses++;
+				missesI++;
 				if (invalid_line(index_sel, N))
 				{
 					D printf("Invalid line!\n");
 					if (same_tag(index_sel, N, tag_sel))
 					{
-						UpdateLRUInstr(index_sel, way_num);
+						UpdateLRUData(index_sel, way_num);
 						cache_behaviour(N, index_sel, way_num);
 						instruction_cache[index_sel][way_num].line_accessed = 1;
 					}
 					else
 					{
-						UpdateLRUInstr(index_sel, way_num);
+						UpdateLRUData(index_sel, way_num);
 						cache_behaviour(N, index_sel, way_num);
 						instruction_cache[index_sel][way_num].line_accessed = 1;
 						instruction_cache[index_sel][way_num].tag_store = tag_sel;
@@ -195,7 +196,7 @@ int main()
 			D printf("N is 3 or 4\n");
 			if (hit_or_miss(tag_sel, index_sel, N))
 			{
-				D printf("We had a HIT!!\n");
+				D printf("We had a Snoop HIT!!\n");
 				if (N == 4 && mode == 1 && data_cache[index_sel][way_num].MESI == M)
 				{
 					D printf("N is 4 and MODE is 1\n");

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <inttypes.h>
-//#define DEBUG 1
+#define DEBUG 1
 #define COVERAGE
 
 #ifdef DEBUG
@@ -34,7 +34,7 @@
 #define CACHE_SIZE_DATA (SETS * WAYS_DATA * BYTES)
 #define CACHE_SIZE_INSTR (SETS * WAYS_INSTR * BYTES)
 #define LINE_LENGTH 250
-#define FILE_NAME "TraceFile.txt"
+#define FILE_NAME "traceFile(1).txt"
 
 // MESI states:-
 #define I 0
@@ -75,6 +75,8 @@ extern int hits;
 extern int misses;
 extern int way_num;
 extern int wayflag;
+extern int hitsI;
+extern int missesI;
 // extern int mode;
 // int way_num;
 stored_data instruction_cache[SETS][WAYS_INSTR]; // to store instruction cache line data which are of type stored_data (structure).
