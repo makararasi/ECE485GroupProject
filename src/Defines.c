@@ -439,3 +439,39 @@ bool same_tag(uint16_t index, uint8_t n, uint16_t tag)
     }
     return false;
 }
+
+
+void print_assertion_data(uint16_t index, int way, bool type, uint8_t ADLRU[],uint8_t AILRU[],FILE *afptr)
+{
+    if(type)
+    {
+        for(int i = 0; i< WAYS_DATA; ++i)
+        {
+            if(i == way)
+            {
+                A fprintf(afptr, "%0d%0*x%0d%0d%0*x\n",type,4,index,i,1,2,ADLRU[i]); 
+            }
+            else
+            {
+                A fprintf(afptr, "%0d%0*x%0d%0d%0*x\n",type,4,index,i,0,2,ADLRU[i]); 
+            }
+        }
+    }
+    else
+    {
+        for(int i = 0; i< WAYS_INSTR; ++i)
+        {
+            if(i == way)
+            {
+                A fprintf(afptr, "%0d%0*x%0d%0d%0*x\n",type,4,index,i,1,2,AILRU[i]); 
+            }
+            else
+            {
+                A fprintf(afptr, "%0d%0*x%0d%0d%0*x\n",type,4,index,i,0,2,AILRU[i]); 
+            }
+        }
+
+    }
+
+}
+

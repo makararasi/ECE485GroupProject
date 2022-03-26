@@ -18,7 +18,7 @@ int main()
 	input_addr given_addr;
 	uint16_t index_sel, tag_sel;
 	FILE *fptr;
-
+    FILE *Afptr;
 	// program requires 2 modes.  Here we ask the user to choose which mode
 	// mode can only be 0 or 1
 	bool modeSel = false;
@@ -38,7 +38,8 @@ int main()
 		}
 	}
 
-	C fptr = fopen("coverage.txt", "w+");
+	C fptr  = fopen("coverage.txt", "w+");
+    A Afptr = fopen("assertion_dat.txt","w+");
 
 	memset(instruction_cache, 0, CACHE_SIZE_INSTR); // it will set our cache to all zeros to start with.
 	memset(data_cache, 0, CACHE_SIZE_DATA);
@@ -76,6 +77,7 @@ int main()
 				// make note that this line was accessed
 				data_cache[index_sel][way_num].line_accessed = 1; //<TYPEof cache 1 or 0><indexsel><way_num><MESII>
 				C fprintf(fptr, "%0d%0*x%0d%0d\n", 1, 4, index_sel, way_num, data_cache[index_sel][way_num].MESI);
+                A print_assertion_data(index_sel,way_num,AD,LRU_data[index_sel],LRU_instruction[index_sel],Afptr);
 			}
 			else
 			{
@@ -110,6 +112,7 @@ int main()
 						data_cache[index_sel][way_num].tag_store = tag_sel;
 					}
 					C fprintf(fptr, "%0d%0*x%0d%0d\n", 1, 4, index_sel, way_num, data_cache[index_sel][way_num].MESI);
+                    A print_assertion_data(index_sel,way_num,AD,LRU_data[index_sel],LRU_instruction[index_sel],Afptr);
 				}
 				else // Evict the LRU cache line.
 				{
@@ -129,6 +132,7 @@ int main()
 					cache_behaviour(N, index_sel, way_num);
 					data_cache[index_sel][way_num].line_accessed = 1;
 					C fprintf(fptr, "%0d%0*x%0d%0d\n", 1, 4, index_sel, way_num, data_cache[index_sel][way_num].MESI);
+                    A print_assertion_data(index_sel,way_num,AD,LRU_data[index_sel],LRU_instruction[index_sel],Afptr);
 				}
 			}
 		}
@@ -144,6 +148,7 @@ int main()
 				UpdateLRUInstr(index_sel, way_num);
 				instruction_cache[index_sel][way_num].line_accessed = 1;
 				C fprintf(fptr, "%0d%0*x%0d%0d\n", 0, 4, index_sel, way_num, instruction_cache[index_sel][way_num].MESI);
+                A print_assertion_data(index_sel,way_num,AI,LRU_data[index_sel],LRU_instruction[index_sel],Afptr);
 			}
 			else
 			{
@@ -172,6 +177,7 @@ int main()
 					}
 
 					C fprintf(fptr, "%0d%0*x%d%0d\n", 0, 4, index_sel, way_num, instruction_cache[index_sel][way_num].MESI);
+                    A print_assertion_data(index_sel,way_num,AI,LRU_data[index_sel],LRU_instruction[index_sel],Afptr);
 				}
 				else
 				{
@@ -186,6 +192,7 @@ int main()
 					instruction_cache[index_sel][way_num].MESI = E;
 					instruction_cache[index_sel][way_num].line_accessed = 1;
 					C fprintf(fptr, "%0d%0*x%d%0d\n", 0, 4, index_sel, way_num, instruction_cache[index_sel][way_num].MESI);
+                    A print_assertion_data(index_sel,way_num,AI,LRU_data[index_sel],LRU_instruction[index_sel],Afptr);
 				}
 			}
 		}
@@ -204,6 +211,7 @@ int main()
 				UpdateLRUData(index_sel, way_num);
 				data_cache[index_sel][way_num].MESI = I;
 				C fprintf(fptr, "%0d%0*x%d%0d\n", 1, 4, index_sel, way_num, data_cache[index_sel][way_num].MESI);
+                A print_assertion_data(index_sel,way_num,AD,LRU_data[index_sel],LRU_instruction[index_sel],Afptr);
 			}
 		}
 		// Clear the cache and reset all states

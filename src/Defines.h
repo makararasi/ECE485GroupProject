@@ -10,7 +10,9 @@
 #include <inttypes.h>
 //#define DEBUG 1
 #define COVERAGE
-
+#define ASSERTIONS 
+#define AD 1   // assertions cache type define (assertion data cache)
+#define AI 0  //  assertions cache type define (assertion instruction cache)
 #ifdef DEBUG
 #define D if (1)
 #else
@@ -22,6 +24,13 @@
 #else
 #define C if (0)
 #endif
+
+#ifdef ASSERTIONS
+#define A if (1)
+#else
+#define A if (0)
+#endif
+
 
 #define MRU_DATA (WAYS_DATA - 1)
 #define MRU_INSTR (WAYS_INSTR - 1)
@@ -140,4 +149,7 @@ bool same_tag(uint16_t index, uint8_t n, uint16_t tag);
 
 /* This function is checking if the way number is valid or not. */
 void check_waynum(uint16_t index);
+
+/* This function is used to print data for assertions*/
+void print_assertion_data(uint16_t index, int way, bool type, uint8_t ADLRU[],uint8_t AILRU[],FILE *afptr);
 #endif
