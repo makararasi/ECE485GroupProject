@@ -100,7 +100,7 @@ int lru_invalid_line(uint16_t ip_index, uint8_t n_op)
 *****************************************************************************************/
 bool invalid_line(uint16_t index, uint8_t n)
 {
-	uint8_t mesi_state, count = 0;
+	uint8_t mesi_state, dcount = 0,Icount = 0;
 	if (n == 0 || n == 1)
 	{
 		for (int i = 0; i < WAYS_DATA; i++)
@@ -108,10 +108,21 @@ bool invalid_line(uint16_t index, uint8_t n)
 			mesi_state = data_cache[index][i].MESI;
 			if (mesi_state == I)
 			{
-				count++;
+				dcount++;
 				way_num = i;
 			}
 		}
+
+        if (dcount == 1) {
+		return true; 
+        }
+        else if(dcount > 1){
+        way_num = lru_invalid_line(index, n);
+		return true;
+        }
+        else {
+            return false;
+        }
 	}
 	else
 	{
@@ -120,22 +131,25 @@ bool invalid_line(uint16_t index, uint8_t n)
 			mesi_state = instruction_cache[index][j].MESI;
 			if (mesi_state == I)
 			{
-				count++;
+				Icount++;
 				way_num = j;
 			}
 		}
+
+        if (Icount == 1) {
+		return true; 
+        }
+        else if(Icount > 1){
+        way_num = lru_invalid_line(index, n);
+		return true;
+        }
+        else {
+            return false;
+        }
+
 	}
 
-	if (count == 1)
-		return true;
-	else if (count > 1)
-	{
-		way_num = lru_invalid_line(index, n);
-		return true;
-	}
-	else{
-		return false;
-	}
+	
 }
 
 /***********************************************
@@ -171,7 +185,7 @@ void UpdateLRUData(uint16_t index,int way)
    uint8_t lru = LRU_data[index][way];
    for (int i=0; i<WAYS_DATA; i++)
    {
-       if(LRU_data[index][i]>lru){
+       if(LRU_data[index][i] > lru){
         LRU_data[index][i]--;
        }
    }
